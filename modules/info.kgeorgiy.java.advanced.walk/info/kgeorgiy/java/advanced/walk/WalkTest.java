@@ -80,9 +80,9 @@ public class WalkTest extends BaseTest {
         files.put(randomFileName(), ERROR_HASH);
         final String upperPath = System.getProperty("os.name").toLowerCase().contains("win")
                 ? "//.."
-                : "//..//...";
+                : "/../...";
         files.put(upperPath, ERROR_HASH);
-        
+
         test(files);
     }
 
