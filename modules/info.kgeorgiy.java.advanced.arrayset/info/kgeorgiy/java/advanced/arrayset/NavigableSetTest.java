@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class NavigableSetTest extends BasicSortedSetTest {
+public class NavigableSetTest extends SortedSetTest {
     @Test
     public void test19_ceiling() {
         for (final Pair<NamedComparator, List<Integer>> pair : withComparator()) {
