@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class NavigableSetTest extends BasicSortedSetTest {
+public class NavigableSetTest extends SortedSetTest {
     @Test
     public void test32_ceiling() {
         testElement("ceiling(%s)", NavigableSet::ceiling);
