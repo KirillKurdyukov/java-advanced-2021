@@ -5,7 +5,10 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.NavigableSet;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static net.java.quickcheck.generator.CombinedGeneratorsIterables.somePairs;
@@ -20,74 +23,27 @@ import static org.junit.Assert.assertEquals;
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class NavigableSetTest extends SortedSetTest {
+public class NavigableSetTest extends BasicSortedSetTest {
     @Test
-    public void test19_ceiling() {
-        for (final Pair<NamedComparator, List<Integer>> pair : withComparator()) {
-            final List<Integer> elements = pair.getSecond();
-            final Comparator<Integer> comparator = pair.getFirst();
-            final NavigableSet<Integer> set = set(elements, comparator);
-            final NavigableSet<Integer> treeSet = treeSet(elements, comparator);
-
-            for (final Integer element : inAndOut(elements)) {
-                assertEquals(
-                        "in " + "ceiling" + "(" + element + ") (comparator = " + comparator + ", elements = " + elements + ")",
-                        treeSet.ceiling(element),
-                        set.ceiling(element)
-                );
-            }
-        }
+    public void test32_ceiling() {
+        testElement("ceiling(%s)", NavigableSet::ceiling);
     }
 
     @Test
-    public void test21_floor() {
-        for (final Pair<NamedComparator, List<Integer>> pair : withComparator()) {
-            final List<Integer> elements = pair.getSecond();
-            final Comparator<Integer> comparator = pair.getFirst();
-            final NavigableSet<Integer> set = set(elements, comparator);
-            final NavigableSet<Integer> treeSet = treeSet(elements, comparator);
-
-            for (final Integer element : inAndOut(elements)) {
-                assertEquals(
-                        "in floor(" + element + ") (comparator = " + comparator + ", elements = " + elements + ")",
-                        treeSet.floor(element),
-                        set.floor(element)
-                );
-            }
-        }
+    public void test34_floor() {
+        testElement("floor(%s)", NavigableSet::floor);
     }
 
-    @Test
-    public void test22_navigableTailSet() {
-        for (final Pair<NamedComparator, List<Integer>> pair : withComparator()) {
-            final List<Integer> elements = pair.getSecond();
-            final Comparator<Integer> comparator = pair.getFirst();
-            final NavigableSet<Integer> set = set(elements, comparator);
-            final NavigableSet<Integer> treeSet = treeSet(elements, comparator);
 
-            for (final Integer element : inAndOut(elements)) {
-                assertEq(
-                        set.tailSet(element, true),
-                        treeSet.tailSet(element, true),
-                        "in tailSet(" + element + ", true) (comparator = " + comparator + ", elements = " + elements + ")"
-                );
-                assertEq(
-                        set.tailSet(element, false),
-                        treeSet.tailSet(element, false),
-                        "in tailSet(" + element + ", false) (comparator = " + comparator + ", elements = " + elements + ")"
-                );
-            }
-        }
+    @Test
+    public void test35_navigableTailSet() {
+        testElement("tailSet(%s, true)", (s, e) -> s.tailSet(e, true));
+        testElement("tailSet(%s, false)", (s, e) -> s.tailSet(e, false));
     }
 
     @Test
     public void test24_navigableSubSet() {
-        for (final Pair<NamedComparator, List<Integer>> pair : withComparator()) {
-            final List<Integer> elements = pair.getSecond();
-            final Comparator<Integer> comparator = pair.getFirst();
-            final NavigableSet<Integer> set = set(elements, comparator);
-            final NavigableSet<Integer> treeSet = treeSet(elements, comparator);
-
+        testN((elements, comparator, treeSet, set, context) -> {
             final Collection<Integer> all = values(elements);
             for (final Pair<Integer, Integer> p : somePairs(fixedValues(all), fixedValues(all))) {
                 final Integer from = p.getFirst();
@@ -106,13 +62,15 @@ public class NavigableSetTest extends SortedSetTest {
                     }
                 }
             }
-        }
+        });
     }
 
     @Test
     public void test26_descendingSet() {
-        final NavigableSet<Integer> set = set(Arrays.asList(10, 20, 30), Integer::compareTo).descendingSet();
-        assertEquals("toArray()", Arrays.asList(30, 20, 10), toArray(set));
+        final List<Integer> data = List.of(10, 20, 30);
+        final NavigableSet<Integer> s = set(data, Integer::compareTo);
+        final NavigableSet<Integer> set = s.descendingSet();
+        assertEquals("toArray()", List.of(30, 20, 10), toArray(set));
         assertEquals("size()", 3, set.size());
         assertEquals("first()", 30, set.first().intValue());
         assertEquals("last()", 10, set.last().intValue());
@@ -126,7 +84,7 @@ public class NavigableSetTest extends SortedSetTest {
         testGet("headSet(%s).size()", i -> set.headSet(i).size(), descendingPairs(3, 2, 2, 1, 1, 0, 0));
         testGet("tailSet(%s).size()", i -> set.tailSet(i).size(), descendingPairs(0, 1, 1, 2, 2, 3, 3));
 
-        assertEquals("descendingSet().toArray()", Arrays.asList(10, 20, 30), toArray(set.descendingSet()));
+        assertEquals("descendingSet().toArray()", data, toArray(set.descendingSet()));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -153,12 +111,20 @@ public class NavigableSetTest extends SortedSetTest {
         return new Pair<>(arg, result);
     }
 
-    protected NavigableSet<Integer> set(final List<Integer> elements, final Comparator<Integer> comparator) {
-        return (NavigableSet<Integer>) super.set(elements, comparator);
+
+    private static void testN(final TestCase<Integer, NavigableSet<Integer>> testCase) {
+        test(testCase);
     }
 
-
-    protected NavigableSet<Integer> treeSet(final List<Integer> elements, final Comparator<Integer> comparator) {
-        return (NavigableSet<Integer>) super.treeSet(elements, comparator);
+    private static <R> void testElement(final String name, final BiFunction<NavigableSet<Integer>, Integer, R> f) {
+        testN((elements, comparator, treeSet, set, context) -> {
+            for (final Integer element : inAndOut(elements)) {
+                assertEquals(
+                        String.format("in %s %s", String.format(name, element), context),
+                        f.apply(treeSet, element),
+                        f.apply(set, element)
+                );
+            }
+        });
     }
 }
