@@ -25,15 +25,24 @@ import static org.junit.Assert.assertEquals;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NavigableSetTest extends SortedSetTest {
     @Test
+    public void test31_lower() {
+        testElement("lower(%s)", NavigableSet::lower);
+    }
+
+    @Test
     public void test32_ceiling() {
         testElement("ceiling(%s)", NavigableSet::ceiling);
+    }
+
+    @Test
+    public void test33_higher() {
+        testElement("higher(%s)", NavigableSet::higher);
     }
 
     @Test
     public void test34_floor() {
         testElement("floor(%s)", NavigableSet::floor);
     }
-
 
     @Test
     public void test35_navigableTailSet() {
@@ -42,9 +51,15 @@ public class NavigableSetTest extends SortedSetTest {
     }
 
     @Test
-    public void test24_navigableSubSet() {
+    public void test36_navigableHeadSet() {
+        testElement("headSet(%s, true)", (s, e) -> s.headSet(e, true));
+        testElement("headSet(%s, false)", (s, e) -> s.headSet(e, false));
+    }
+
+    @Test
+    public void test37_navigableSubSet() {
         testN((elements, comparator, treeSet, set, context) -> {
-            final Collection<Integer> all = values(elements);
+            final Collection<Integer> all = inAndOut(elements);
             for (final Pair<Integer, Integer> p : somePairs(fixedValues(all), fixedValues(all))) {
                 final Integer from = p.getFirst();
                 final Integer to = p.getSecond();
@@ -66,7 +81,7 @@ public class NavigableSetTest extends SortedSetTest {
     }
 
     @Test
-    public void test26_descendingSet() {
+    public void test39_descendingSet() {
         final List<Integer> data = List.of(10, 20, 30);
         final NavigableSet<Integer> s = set(data, Integer::compareTo);
         final NavigableSet<Integer> set = s.descendingSet();
@@ -87,21 +102,19 @@ public class NavigableSetTest extends SortedSetTest {
         assertEquals("descendingSet().toArray()", data, toArray(set.descendingSet()));
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private static Pair<Integer, Integer>[] descendingPairs(final Integer v5, final Integer v10, final Integer v15, final Integer v20, final Integer v25, final Integer v30, final Integer v35) {
-        return new Pair[]{
+    private static List<Pair<Integer, Integer>> descendingPairs(final Integer v5, final Integer v10, final Integer v15, final Integer v20, final Integer v25, final Integer v30, final Integer v35) {
+        return List.of(
                 pair(5, v5),
                 pair(10, v10),
                 pair(15, v15),
                 pair(20, v20),
                 pair(25, v25),
                 pair(30, v30),
-                pair(35, v35),
-        } ;
+                pair(35, v35)
+        );
     }
 
-    @SafeVarargs
-    private static <T> void testGet(final String format, final Function<T, T> method, final Pair<T, T>... pairs) {
+    private static <T> void testGet(final String format, final Function<T, T> method, final List<Pair<T, T>> pairs) {
         for (final Pair<T, T> pair : pairs) {
             assertEquals(String.format(format, pair.getFirst()), pair.getSecond(), method.apply(pair.getFirst()));
         }
@@ -110,7 +123,6 @@ public class NavigableSetTest extends SortedSetTest {
     private static <T> Pair<T, T> pair(final T arg, final T result) {
         return new Pair<>(arg, result);
     }
-
 
     private static void testN(final TestCase<Integer, NavigableSet<Integer>> testCase) {
         test(testCase);

@@ -9,14 +9,14 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static net.java.quickcheck.generator.CombinedGenerators.excludeValues;
 import static net.java.quickcheck.generator.CombinedGenerators.lists;
-import static net.java.quickcheck.generator.CombinedGeneratorsIterables.someOneOf;
-import static net.java.quickcheck.generator.CombinedGeneratorsIterables.somePairs;
+import static net.java.quickcheck.generator.CombinedGeneratorsIterables.*;
 import static net.java.quickcheck.generator.PrimitiveGenerators.fixedValues;
 import static net.java.quickcheck.generator.PrimitiveGenerators.integers;
 
@@ -29,6 +29,9 @@ import static net.java.quickcheck.generator.PrimitiveGenerators.integers;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SortedSetTest extends BaseTest {
+    public static final int PERFORMANCE_SIZE = 1_000_000;
+    public static final int PERFORMANCE_TIME = 10_000;
+
     @Test
     public void test01_constructors() {
         final Class<?> token = loadClass();
@@ -48,8 +51,22 @@ public class SortedSetTest extends BaseTest {
     }
 
     @Test
+    public void test03_naturalOrder() {
+        for (final List<Integer> elements : someLists(integers())) {
+            final SortedSet<Integer> set = set(elements);
+            final SortedSet<Integer> treeSet = treeSet(elements);
+            assertEq(treeSet, set, "elements = " + elements);
+        }
+    }
+
+    @Test
     public void test04_externalOrder() {
         test((elements, comparator, treeSet, set, context) -> assertEq(treeSet, set, context));
+    }
+
+    @Test
+    public void test05_constructorPerformance() {
+        performance("constructor", SortedSetTest::performanceSet);
     }
 
     @Test
@@ -61,6 +78,16 @@ public class SortedSetTest extends BaseTest {
 
             for (final Integer element : someOneOf(excludeValues(integers(), elements))) {
                 Assert.assertEquals("contains(" + element + ") " + context, treeSet.contains(element), set.contains(element));
+            }
+        });
+    }
+
+    @Test
+    public void test08_containsPerformance() {
+        performance("contains", () -> {
+            final SortedSet<Integer> set = performanceSet();
+            for (final Integer element : set) {
+                Assert.assertTrue(null, set.contains(element));
             }
         });
     }
@@ -78,12 +105,34 @@ public class SortedSetTest extends BaseTest {
         });
     }
 
+    private static void performance(final String description, final Runnable runnable) {
+        runnable.run();
+
+        final long start = System.currentTimeMillis();
+        runnable.run();
+        final long time = System.currentTimeMillis() - start;
+        System.err.println("    " + description + " done in " + time + "ms");
+        Assert.assertTrue(description + " works too slow", time < PERFORMANCE_TIME);
+    }
+
+    private static SortedSet<Integer> performanceSet() {
+        return set(new Random().ints().limit(PERFORMANCE_SIZE).boxed().collect(Collectors.toList()));
+    }
+
     private static List<Integer> toList(final SortedSet<Integer> set) {
         return new ArrayList<>(set);
     }
 
     protected static List<Number> toArray(final SortedSet<Integer> set) {
         return List.of(set.toArray(new Number[0]));
+    }
+
+    private static TreeSet<Integer> treeSet(final List<Integer> elements) {
+        return new TreeSet<>(elements);
+    }
+
+    private static SortedSet<Integer> set(final List<Integer> elements) {
+        return create(new Object[]{elements}, Collection.class);
     }
 
     protected static void assertEq(final SortedSet<Integer> expected, final SortedSet<Integer> actual, final String context) {
@@ -104,7 +153,7 @@ public class SortedSetTest extends BaseTest {
     protected static <T, S extends SortedSet<T>> S set(final List<T> elements, final Comparator<T> comparator) {
         return (S) create(new Object[]{elements, comparator}, Collection.class, Comparator.class);
     }
-
+    
     protected static final Generator<NamedComparator> NAMED_COMPARATORS = fixedValues(
             new NamedComparator("Natural order", Integer::compare),
             new NamedComparator("Reverse order", Comparator.comparingInt(Integer::intValue).reversed()),
@@ -141,6 +190,9 @@ public class SortedSetTest extends BaseTest {
     public void test11_comparator() {
         test((elements, comparator, treeSet, set, context) ->
                 Assert.assertSame("comparator() should return provided comparator", comparator, set.comparator()));
+        for (final List<Integer> elements : someLists(integers())) {
+            Assert.assertNull("comparator() should return null for default order", set(elements).comparator());
+        }
     }
 
     @Test
@@ -152,22 +204,27 @@ public class SortedSetTest extends BaseTest {
         });
     }
 
+    @Test
+    public void test13_tailSet() {
+        test((elements, comparator, treeSet, set, context) -> {
+            for (final Integer element : inAndOut(elements)) {
+                assertEq(treeSet.tailSet(element), set.tailSet(element), "in tailSet(" + element + ") " + context);
+            }
+        });
+    }
+
     protected static Collection<Integer> inAndOut(final List<Integer> elements) {
-        return concat(elements, someOneOf(excludeValues(integers(), elements)));
-    }
-
-    private static <T> Collection<T> concat(final Iterable<? extends T> items1, final Iterable<? extends T> items2) {
-        return Stream.concat(stream(items1), stream(items2)).collect(Collectors.toList());
-    }
-
-    private static <T> Stream<T> stream(final Iterable<T> items1) {
-        return StreamSupport.stream(items1.spliterator(), false);
+        return Stream.of(
+                elements.stream().flatMap(e -> Stream.of(e, e - 1, e + 1)),
+                Stream.of(0, Integer.MAX_VALUE, Integer.MIN_VALUE),
+                StreamSupport.stream(someOneOf(excludeValues(integers(), elements)).spliterator(), false)
+        ).flatMap(Function.identity()).collect(Collectors.toList());
     }
 
     @Test
     public void test14_subSet() {
         test((elements, comparator, treeSet, set, context) -> {
-            final Collection<Integer> all = values(elements);
+            final Collection<Integer> all = inAndOut(elements);
             for (final Pair<Integer, Integer> p : somePairs(fixedValues(all), fixedValues(all))) {
                 final Integer from = p.getFirst();
                 final Integer to = p.getSecond();
@@ -176,27 +233,40 @@ public class SortedSetTest extends BaseTest {
                             treeSet.subSet(from, to), set.subSet(from, to),
                             "in subSet(" + from + ", " + to + ") " + context
                     );
+                } else {
+                    try {
+                        //noinspection ResultOfMethodCallIgnored
+                        set.subSet(from, to);
+                        Assert.fail("IllegalArgumentException expected");
+                    } catch (final IllegalArgumentException ignored) {
+                        // Passed
+                    }
                 }
             }
         });
     }
 
-    protected static Collection<Integer> values(final List<Integer> elements) {
-        return concat(inAndOut(elements), List.of(0, Integer.MAX_VALUE, Integer.MIN_VALUE));
+    @Test
+    public void test16_first() {
+        testFirstLast("first", SortedSet::first);
     }
 
     @Test
-    public void test16_first() {
+    public void test17_last() {
+        testFirstLast("last", SortedSet::last);
+    }
+
+    private static void testFirstLast(final String name, final Function<SortedSet<Integer>, Integer> action) {
         test((elements, comparator, treeSet, set, context) -> {
             if (elements.isEmpty()) {
                 try {
-                    set.first();
-                    Assert.fail("first" + "() should throw NoSuchElementException for empty set");
+                    action.apply(set);
+                    Assert.fail(name + "() should throw NoSuchElementException for empty set");
                 } catch (final NoSuchElementException e) {
                     // ok
                 }
             } else {
-                Assert.assertEquals("first" + "() (comparator = " + comparator + ", elements = " + elements + ")", treeSet.first(), treeSet.first());
+                Assert.assertEquals(name + "() (comparator = " + comparator + ", elements = " + elements + ")", action.apply(treeSet), action.apply(set));
             }
         });
     }
