@@ -6,10 +6,9 @@ import org.junit.runners.MethodSorters;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Tests for hard version
@@ -19,15 +18,22 @@ import java.util.stream.Collectors;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class RecursiveWalkTest extends WalkTest {
+    @Test @Override
+    public void test46_filesAndDirs() throws IOException {
+        final Map<String, String> entries = randomFiles(10, 100);
+        final Set<String> dirs = randomDirs(5).keySet();
+        test(Stream.concat(entries.keySet().stream(), dirs.stream()).collect(Collectors.toSet()), entries);
+    }
+
     @Test
     public void test70_singleRecursion() throws IOException {
-        final Path root = DIR.resolve(name.getMethodName());
-        test(Collections.singletonList(root.toString()), randomDirs(3, 4, 100, root));
+        final Path root = getTestDir();
+        test(List.of(root.toString()), randomDirs(3, 4, 100, root));
     }
 
     @Test
     public void test80_doubleRecursion() throws IOException {
-        final Path root = DIR.resolve(name.getMethodName());
+        final Path root = getTestDir();
         final Path dir1 = root.resolve(randomFileName());
         final Path dir2 = root.resolve(randomFileName());
         final String from = dir1.toString();
@@ -41,9 +47,9 @@ public class RecursiveWalkTest extends WalkTest {
     }
 
     private Map<String, String> randomDirs(final int n, final int d, final int maxL, final Path dir) throws IOException {
-        final Map<String, String> result = randomFiles(RANDOM.nextInt(n + 1), maxL, dir);
+        final Map<String, String> result = randomFiles(random.nextInt(n + 1), maxL, dir);
         if (d > 0) {
-            for (int i = RANDOM.nextInt(n + 1); i < n; i++) {
+            for (int i = random.nextInt(n + 1); i < n; i++) {
                 result.putAll(randomDirs(n, d - 1, maxL, dir.resolve(randomFileName())));
             }
         }

@@ -1,7 +1,6 @@
 package info.kgeorgiy.java.advanced.arrayset;
 
 import info.kgeorgiy.java.advanced.base.BaseTest;
-import net.java.quickcheck.Generator;
 import net.java.quickcheck.collection.Pair;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -105,7 +104,7 @@ public class SortedSetTest extends BaseTest {
         });
     }
 
-    private static void performance(final String description, final Runnable runnable) {
+    protected static void performance(final String description, final Runnable runnable) {
         runnable.run();
 
         final long start = System.currentTimeMillis();
@@ -115,8 +114,12 @@ public class SortedSetTest extends BaseTest {
         Assert.assertTrue(description + " works too slow", time < PERFORMANCE_TIME);
     }
 
-    private static SortedSet<Integer> performanceSet() {
-        return set(new Random().ints().limit(PERFORMANCE_SIZE).boxed().collect(Collectors.toList()));
+    protected static SortedSet<Integer> performanceSet() {
+        return performanceSet(PERFORMANCE_SIZE);
+    }
+
+    protected static SortedSet<Integer> performanceSet(final int size) {
+        return set(new Random().ints().limit(size).boxed().collect(Collectors.toList()));
     }
 
     private static List<Integer> toList(final SortedSet<Integer> set) {
@@ -131,7 +134,7 @@ public class SortedSetTest extends BaseTest {
         return new TreeSet<>(elements);
     }
 
-    private static SortedSet<Integer> set(final List<Integer> elements) {
+    protected static SortedSet<Integer> set(final List<Integer> elements) {
         return create(new Object[]{elements}, Collection.class);
     }
 
@@ -143,38 +146,38 @@ public class SortedSetTest extends BaseTest {
         Assert.assertSame("invalid comparator " + context, expected.comparator(), actual.comparator());
     }
 
-    protected static <T, S extends SortedSet<T>> S treeSet(final List<T> elements, final Comparator<T> comparator) {
+    protected static <T, S extends SortedSet<T>> S treeSet(final Collection<T> elements, final Comparator<T> comparator) {
         @SuppressWarnings("unchecked") final S set = (S) new TreeSet<>(comparator);
         set.addAll(elements);
         return set;
     }
 
     @SuppressWarnings("unchecked")
-    protected static <T, S extends SortedSet<T>> S set(final List<T> elements, final Comparator<T> comparator) {
+    protected static <T, S extends SortedSet<T>> S set(final Collection<T> elements, final Comparator<T> comparator) {
         return (S) create(new Object[]{elements, comparator}, Collection.class, Comparator.class);
     }
     
-    protected static final Generator<NamedComparator> NAMED_COMPARATORS = fixedValues(
-            new NamedComparator("Natural order", Integer::compare),
-            new NamedComparator("Reverse order", Comparator.comparingInt(Integer::intValue).reversed()),
+    protected static final List<NamedComparator> NAMED_COMPARATORS = new ArrayList<>(List.of(
+            new NamedComparator("Natural order", java.lang.Integer::compare),
+            new NamedComparator("Reverse order", Comparator.comparingInt(java.lang.Integer::intValue).reversed()),
             new NamedComparator("Div 100", Comparator.comparingInt(i -> i / 100)),
-            new NamedComparator("Even first", Comparator.<Integer>comparingInt(i -> i % 2).thenComparing(Integer::intValue)),
+            new NamedComparator("Even first", Comparator.<Integer>comparingInt(i -> i % 2).thenComparing(java.lang.Integer::intValue)),
             new NamedComparator("All equal", Comparator.comparingInt(i -> 0))
-    );
+    ));
 
     protected interface TestCase<T, S extends SortedSet<T>> {
         void test(List<T> elements, Comparator<T> comparator, S model, S tested, String context);
     }
 
     protected static <S extends SortedSet<Integer>> void test(final TestCase<Integer, S> testCase) {
-        somePairs(NAMED_COMPARATORS, lists(integers())).forEach(e -> {
+        somePairs(fixedValues(NAMED_COMPARATORS), lists(integers())).forEach(e -> {
             final List<Integer> elements = e.getSecond();
             final NamedComparator comparator = e.getFirst();
             testCase.test(elements, comparator, treeSet(elements, comparator), set(elements, comparator), "(comparator = " + comparator + ", elements = " + elements + ")");
         });
     }
 
-    private static SortedSet<Integer> create(final Object[] params, final Class<?>... types) {
+    protected static SortedSet<Integer> create(final Object[] params, final Class<?>... types) {
         try {
             @SuppressWarnings("unchecked") final
             SortedSet<Integer> set = (SortedSet<Integer>) loadClass().getConstructor(types).newInstance(params);
@@ -213,10 +216,10 @@ public class SortedSetTest extends BaseTest {
         });
     }
 
-    protected static Collection<Integer> inAndOut(final List<Integer> elements) {
+    protected static Collection<Integer> inAndOut(final Collection<Integer> elements) {
         return Stream.of(
                 elements.stream().flatMap(e -> Stream.of(e, e - 1, e + 1)),
-                Stream.of(0, Integer.MAX_VALUE, Integer.MIN_VALUE),
+                Stream.of(0, java.lang.Integer.MAX_VALUE, java.lang.Integer.MIN_VALUE),
                 StreamSupport.stream(someOneOf(excludeValues(integers(), elements)).spliterator(), false)
         ).flatMap(Function.identity()).collect(Collectors.toList());
     }
@@ -228,7 +231,7 @@ public class SortedSetTest extends BaseTest {
             for (final Pair<Integer, Integer> p : somePairs(fixedValues(all), fixedValues(all))) {
                 final Integer from = p.getFirst();
                 final Integer to = p.getSecond();
-                if (comparator.compare(from, to) <= 0) {
+                if (compare(comparator, from, to)) {
                     assertEq(
                             treeSet.subSet(from, to), set.subSet(from, to),
                             "in subSet(" + from + ", " + to + ") " + context
@@ -244,6 +247,10 @@ public class SortedSetTest extends BaseTest {
                 }
             }
         });
+    }
+
+    protected boolean compare(final Comparator<Integer> comparator, final Integer from, final Integer to) {
+        return comparator.compare(from, to) <= 0;
     }
 
     @Test

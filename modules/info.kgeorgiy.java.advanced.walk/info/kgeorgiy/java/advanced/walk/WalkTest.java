@@ -1,22 +1,19 @@
 package info.kgeorgiy.java.advanced.walk;
 
 import info.kgeorgiy.java.advanced.base.BaseTest;
-import org.junit.Assert;
-import org.junit.FixMethodOrder;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TestName;
 import org.junit.runners.MethodSorters;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,16 +26,37 @@ import java.util.stream.Collectors;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class WalkTest extends BaseTest {
-    protected static final Path DIR = Path.of("__Test__Walk__");
+    private static final Path DIR = Path.of("__Test__Walk__");
     private static final String ENGLISH_DIGITS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    protected static final Random RANDOM = new Random(23084701432182342L);
-    public static final String ERROR_HASH = "0000000000000000";
+    private static final SimpleFileVisitor<Path> DELETE = new SimpleFileVisitor<>() {
+        @Override
+        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+            Files.delete(file);
+            return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) throws IOException {
+            Files.delete(dir);
+            return FileVisitResult.CONTINUE;
+        }
+    };
+    protected static final String ERROR_HASH = "0000000000000000";
+
     private String alphabet = ENGLISH_DIGITS;
+    protected final Random random = new Random(23084701432182342L);
 
     @Rule
     public TestName name = new TestName();
 
-    private Path getTestDir() {
+    @BeforeClass
+    public static void beforeClass() throws IOException {
+        if (Files.exists(DIR)) {
+            Files.walkFileTree(DIR, DELETE);
+        }
+    }
+
+    protected Path getTestDir() {
         return DIR.resolve(name.getMethodName());
     }
 
@@ -106,6 +124,14 @@ public class WalkTest extends BaseTest {
     }
 
     @Test
+    public void test46_filesAndDirs() throws IOException {
+        final Map<String, String> entries = new HashMap<>();
+        entries.putAll(randomFiles(10, 100));
+        entries.putAll(randomDirs(10));
+        test(entries);
+    }
+
+    @Test
     public void test50_whitespaceSupport() throws IOException {
         testAlphabet(10, 100, " \u00a0_");
     }
@@ -138,7 +164,7 @@ public class WalkTest extends BaseTest {
         runRaw(input, DIR.toString());
         runRaw(input, "\0*");
         final String file = createEmptyFile(name.getMethodName());
-        runRaw(input, file + "/" + randomFileName());
+        runRaw(input, file + File.separator + randomFileName());
     }
 
     @Test
@@ -176,11 +202,23 @@ public class WalkTest extends BaseTest {
         runRaw(createEmptyFile("a"), createEmptyFile("b"), "c");
     }
 
-    private Map<String, String> randomFiles(final int n, final int maxL) throws IOException {
+    protected Map<String, String> randomFiles(final int n, final int maxL) throws IOException {
         return randomFiles(n, maxL, getTestDir());
     }
 
-    private static String createEmptyFile(final String name) throws IOException {
+    protected Map<String, String> randomDirs(final int n) throws IOException {
+        final Path dir = getTestDir();
+        final Map<String, String> result = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            final String name = randomFileName();
+                final Path path = dir.resolve(name);
+                Files.createDirectories(path);
+                result.put(path.toString(), ERROR_HASH);
+        }
+        return result;
+    }
+
+    private String createEmptyFile(final String name) throws IOException {
         final Path input = DIR.resolve(name);
         Files.write(input, new byte[0]);
         return input.toString();
@@ -213,11 +251,11 @@ public class WalkTest extends BaseTest {
         Assert.assertTrue("Some files missing: \n    " + String.join("\n    ", files.keySet()), files.isEmpty());
     }
 
-    private void run(final Path inputFile, final Path outputFile) {
+    private static void run(final Path inputFile, final Path outputFile) {
         runRaw(inputFile.toString(), outputFile.toString());
     }
 
-    private void runRaw(final String... args) {
+    private static void runRaw(final String... args) {
         final Method method;
         final Class<?> cut = loadClass();
         try {
@@ -225,7 +263,6 @@ public class WalkTest extends BaseTest {
         } catch (final NoSuchMethodException e) {
             throw new AssertionError("Cannot find method main(String[]) of " + cut, e);
         }
-        System.out.println("Running " + name.getMethodName());
         try {
             method.invoke(null, (Object) args);
         } catch (final IllegalAccessException e) {
@@ -250,19 +287,19 @@ public class WalkTest extends BaseTest {
             final String name = randomFileName();
             try {
                 final Path file = dir.resolve(name);
-                final byte[] bytes = new byte[RANDOM.nextInt(maxL + 1)];
-                RANDOM.nextBytes(bytes);
+                final byte[] bytes = new byte[random.nextInt(maxL + 1)];
+                random.nextBytes(bytes);
                 Files.write(file, bytes);
                 result.put(file.toString(), hash(bytes));
             } catch (final InvalidPathException ignore) {
-                result.put(dir + "/" + name, ERROR_HASH);
+                result.put(dir + File.separator + name, ERROR_HASH);
             }
         }
         return result;
     }
 
     protected String randomFileName() {
-        return RANDOM.ints(30, 0, alphabet.length())
+        return random.ints(30, 0, alphabet.length())
                 .mapToObj(i -> alphabet.substring(i, i + 1))
                 .collect(Collectors.joining());
     }

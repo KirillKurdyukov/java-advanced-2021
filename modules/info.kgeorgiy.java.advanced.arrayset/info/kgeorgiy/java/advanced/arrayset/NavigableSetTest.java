@@ -1,13 +1,12 @@
 package info.kgeorgiy.java.advanced.arrayset;
 
 import net.java.quickcheck.collection.Pair;
+import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.NavigableSet;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -24,6 +23,9 @@ import static org.junit.Assert.assertEquals;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NavigableSetTest extends SortedSetTest {
+
+    public static final List<Integer> TEST_DESCENDING_SET_DATA = List.of(10, 20, 30);
+
     @Test
     public void test31_lower() {
         testElement("lower(%s)", NavigableSet::lower);
@@ -63,7 +65,7 @@ public class NavigableSetTest extends SortedSetTest {
             for (final Pair<Integer, Integer> p : somePairs(fixedValues(all), fixedValues(all))) {
                 final Integer from = p.getFirst();
                 final Integer to = p.getSecond();
-                if (comparator.compare(from, to) <= 0) {
+                if (compare(comparator, from, to)) {
                     for (int i = 0; i < 4; i++) {
                         assertEq(
                                 set.subSet(from, i % 2 == 1, to, i / 2 == 1),
@@ -82,49 +84,62 @@ public class NavigableSetTest extends SortedSetTest {
 
     @Test
     public void test39_descendingSet() {
-        final List<Integer> data = List.of(10, 20, 30);
-        final NavigableSet<Integer> s = set(data, Integer::compareTo);
-        final NavigableSet<Integer> set = s.descendingSet();
-        assertEquals("toArray()", List.of(30, 20, 10), toArray(set));
-        assertEquals("size()", 3, set.size());
-        assertEquals("first()", 30, set.first().intValue());
-        assertEquals("last()", 10, set.last().intValue());
-        assertEquals("descendingIterator().next()", 10, set.descendingIterator().next().intValue());
-
-        testGet("floor(%s)", set::floor, descendingPairs(10, 10, 20, 20, 30, 30, null));
-        testGet("lower(%s)", set::lower, descendingPairs(10, 20, 20, 30, 30, null, null));
-        testGet("ceiling(%s)", set::ceiling, descendingPairs(null, 10, 10, 20, 20, 30, 30));
-        testGet("higher(%s)", set::higher, descendingPairs(null, null, 10, 10, 20, 20, 30));
-
-        testGet("headSet(%s).size()", i -> set.headSet(i).size(), descendingPairs(3, 2, 2, 1, 1, 0, 0));
-        testGet("tailSet(%s).size()", i -> set.tailSet(i).size(), descendingPairs(0, 1, 1, 2, 2, 3, 3));
-
-        assertEquals("descendingSet().toArray()", data, toArray(set.descendingSet()));
+        testDescendingSet(treeSet(TEST_DESCENDING_SET_DATA, Integer::compareUnsigned), set(TEST_DESCENDING_SET_DATA, Integer::compareUnsigned));
     }
 
-    private static List<Pair<Integer, Integer>> descendingPairs(final Integer v5, final Integer v10, final Integer v15, final Integer v20, final Integer v25, final Integer v30, final Integer v35) {
-        return List.of(
-                pair(5, v5),
-                pair(10, v10),
-                pair(15, v15),
-                pair(20, v20),
-                pair(25, v25),
-                pair(30, v30),
-                pair(35, v35)
-        );
+    protected static void testDescendingSet(final NavigableSet<Integer> expected, final NavigableSet<Integer> actual) {
+        final SetPair pair = new SetPair(expected.descendingSet(), actual.descendingSet());
+
+        pair.testGet("toArray()", NavigableSetTest::toArray);
+        pair.testGet("size()", NavigableSet::size);
+        pair.testGet("first()", SortedSet::first);
+        pair.testGet("last()", SortedSet::last);
+        pair.testGet("descendingIterator().next()", s -> s.descendingIterator().next());
+
+        pair.testGet("floor(%s)", NavigableSet::floor);
+        pair.testGet("lower(%s)", NavigableSet::lower);
+        pair.testGet("ceiling(%s)", NavigableSet::ceiling);
+        pair.testGet("higher(%s)", NavigableSet::higher);
+
+        pair.testGet("headSet(%s).size()", (s, e) -> s.headSet(e).size());
+        pair.testGet("tailSet(%s).size()", (s, e) -> s.tailSet(e).size());
+
+        pair.testGet("descendingSet().toArray()", s -> toArray(s.descendingSet()));
     }
 
-    private static <T> void testGet(final String format, final Function<T, T> method, final List<Pair<T, T>> pairs) {
-        for (final Pair<T, T> pair : pairs) {
-            assertEquals(String.format(format, pair.getFirst()), pair.getSecond(), method.apply(pair.getFirst()));
+    private static class SetPair {
+        final NavigableSet<Integer> expected, actual;
+
+        public SetPair(final NavigableSet<Integer> expected, final NavigableSet<Integer> actual) {
+            this.expected = expected;
+            this.actual = actual;
+        }
+
+        private <T> void testGet(
+                final String format,
+                final BiFunction<NavigableSet<Integer>, Integer, T> method
+        ) {
+            for (final int element : inAndOut(expected)) {
+                assertEquals(String.format(format, element), method.apply(expected, element), method.apply(actual, element));
+            }
+        }
+
+        private <T> void testGet(final String description, final Function<NavigableSet<Integer>, T> method) {
+            try {
+                final T expected = method.apply(this.expected);
+                assertEquals(description, expected, method.apply(actual));
+            } catch (final NoSuchElementException e) {
+                try {
+                    method.apply(actual);
+                    Assert.fail("NoSuchElementException expected");
+                } catch (final NoSuchElementException ignore) {
+                    // Success
+                }
+            }
         }
     }
 
-    private static <T> Pair<T, T> pair(final T arg, final T result) {
-        return new Pair<>(arg, result);
-    }
-
-    private static void testN(final TestCase<Integer, NavigableSet<Integer>> testCase) {
+    protected static void testN(final TestCase<Integer, NavigableSet<Integer>> testCase) {
         test(testCase);
     }
 
