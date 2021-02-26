@@ -245,7 +245,7 @@ public class WalkTest extends BaseTest {
                 Assert.assertEquals("Wrong hash", files.remove(parts[1]), parts[0]);
             }
         } catch (final IOException e) {
-            throw new AssertionError("Cannot write output file " + outputFile);
+            throw new AssertionError("Cannot read output file " + outputFile);
         }
 
         Assert.assertTrue("Some files missing: \n    " + String.join("\n    ", files.keySet()), files.isEmpty());
