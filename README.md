@@ -2,45 +2,47 @@
 
 [Условия домашних заданий](https://www.kgeorgiy.info/courses/java-advanced/homeworks.html)
 
-
 ## Домашнее задание 2. ArraySortedSet
 
-Тестирование
+Исходный код
 
- * простой вариант:
-    ```info.kgeorgiy.java.advanced.arrayset SortedSet <полное имя класса>```
- * сложный вариант:
-    ```info.kgeorgiy.java.advanced.arrayset NavigableSet <полное имя класса>```
+ * простой вариант (`SortedSet`): 
+    [тесты](modules/info.kgeorgiy.java.advanced.arrayset/info/kgeorgiy/java/advanced/arrayset/SortedSetTest.java)
+ * сложный вариант (`NavigableSet`): 
+    [тесты](modules/info.kgeorgiy.java.advanced.arrayset/info/kgeorgiy/java/advanced/arrayset/NavigableSetTest.java)
+ * продвинутый вариант (`AdvancedSet`): 
+    [тесты](modules/info.kgeorgiy.java.advanced.arrayset/info/kgeorgiy/java/advanced/arrayset/AdvancedSetTest.java)
 
-Исходный код тестов:
-
- * [простой вариант](modules/info.kgeorgiy.java.advanced.arrayset/info/kgeorgiy/java/advanced/arrayset/SortedSetTest.java)
- * [сложный вариант](modules/info.kgeorgiy.java.advanced.arrayset/info/kgeorgiy/java/advanced/arrayset/NavigableSetTest.java)
+Тестовый модуль: [info.kgeorgiy.java.advanced.arrayset](artifacts/info.kgeorgiy.java.advanced.arrayset.jar)
 
 
 ## Домашнее задание 1. Обход файлов
+
+Исходный код
+
+ * простой вариант (`Walk`):
+    [тесты](modules/info.kgeorgiy.java.advanced.walk/info/kgeorgiy/java/advanced/walk/WalkTest.java)
+ * сложный вариант (`RecursiveWalk`):
+    [тесты](modules/info.kgeorgiy.java.advanced.walk/info/kgeorgiy/java/advanced/walk/RecursiveWalkTest.java)
+ * продвинутый вариант (`AdvancedWalk`):
+    должный проходить тесты от простого и с ложного вариантов
+
+Тестовый модуль: [info.kgeorgiy.java.advanced.walk](artifacts/info.kgeorgiy.java.advanced.walk.jar)
 
 Для того, чтобы протестировать программу:
 
  * Скачайте
     * тесты
-        * [info.kgeorgiy.java.advanced.base.jar](artifacts/info.kgeorgiy.java.advanced.base.jar)
-        * [info.kgeorgiy.java.advanced.walk.jar](artifacts/info.kgeorgiy.java.advanced.walk.jar)
-    * и библиотеки к ним:
-        * [junit-4.11.jar](lib/junit-4.11.jar)
-        * [hamcrest-core-1.3.jar](lib/hamcrest-core-1.3.jar)
+        * [базовый модуль](artifacts/info.kgeorgiy.java.advanced.base.jar)
+        * [тестовый модуль](artifacts/info.kgeorgiy.java.advanced.walk.jar) (свой для каждого ДЗ)
+    * [библиотеки](lib)
  * Откомпилируйте решение домашнего задания
  * Протестируйте домашнее задание
     * Текущая директория должна:
        * содержать все скачанные `.jar` файлы;
        * содержать скомпилированное решение;
        * __не__ содержать скомпилированные самостоятельно тесты.
-    * простой вариант:
-        ```java -cp . -p . -m info.kgeorgiy.java.advanced.walk Walk <полное имя класса>```
-    * сложный вариант:
-        ```java -cp . -p . -m info.kgeorgiy.java.advanced.walk RecursiveWalk <полное имя класса>```
-
-Исходный код тестов:
-
- * [простой вариант](modules/info.kgeorgiy.java.advanced.walk/info/kgeorgiy/java/advanced/walk/WalkTest.java)
- * [сложный вариант](modules/info.kgeorgiy.java.advanced.walk/info/kgeorgiy/java/advanced/walk/RecursiveWalkTest.java)
+    * Запустите тесты:
+        `java -cp . -p . -m <тестовый модуль> <вариант> <полное имя класса>`
+    * Пример для простого варианта ДЗ-1:
+        `java -cp . -p . -m info.kgeorgiy.java.advanced.walk Walk <полное имя класса>`
