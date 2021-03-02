@@ -48,7 +48,7 @@ public class GroupQueryTest extends StudentQueryTest {
         List<Student> groupStudents = new ArrayList<>();
         final List<Group> groups = new ArrayList<>();
 
-        for (final Student student : StudentQueryTest_Basic.getStudents(students, answer)) {
+        for (final Student student : StudentQueryTest.getStudents(students, answer)) {
             if (group != null && !group.equals(student.getGroup())) {
                 groups.add(new Group(group, groupStudents));
                 groupStudents = new ArrayList<>();
