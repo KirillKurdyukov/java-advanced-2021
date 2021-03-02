@@ -1,8 +1,10 @@
 package info.kgeorgiy.java.advanced.walk;
 
 import info.kgeorgiy.java.advanced.base.BaseTest;
-import org.junit.*;
-import org.junit.rules.TestName;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.io.File;
@@ -46,9 +48,6 @@ public class WalkTest extends BaseTest {
     private String alphabet = ENGLISH_DIGITS;
     protected final Random random = new Random(23084701432182342L);
 
-    @Rule
-    public TestName name = new TestName();
-
     @BeforeClass
     public static void beforeClass() throws IOException {
         if (Files.exists(DIR)) {
@@ -57,7 +56,7 @@ public class WalkTest extends BaseTest {
     }
 
     protected Path getTestDir() {
-        return DIR.resolve(name.getMethodName());
+        return DIR.resolve(testMethodName);
     }
 
     @Test
@@ -160,10 +159,10 @@ public class WalkTest extends BaseTest {
 
     @Test
     public void test62_invalidOutput() throws IOException {
-        final String input = createEmptyFile(name.getMethodName());
+        final String input = createEmptyFile(testMethodName);
         runRaw(input, DIR.toString());
         runRaw(input, "\0*");
-        final String file = createEmptyFile(name.getMethodName());
+        final String file = createEmptyFile(testMethodName);
         runRaw(input, file + File.separator + randomFileName());
     }
 
@@ -174,7 +173,7 @@ public class WalkTest extends BaseTest {
 
     @Test
     public void test70_singleArgument() throws IOException {
-        runRaw(createEmptyFile(name.getMethodName()));
+        runRaw(createEmptyFile(testMethodName));
     }
 
     @Test
@@ -194,7 +193,7 @@ public class WalkTest extends BaseTest {
 
     @Test
     public void test74_secondArgumentNull() throws IOException {
-        runRaw(createEmptyFile(name.getMethodName()), null);
+        runRaw(createEmptyFile(testMethodName), null);
     }
 
     @Test
@@ -218,7 +217,7 @@ public class WalkTest extends BaseTest {
         return result;
     }
 
-    private String createEmptyFile(final String name) throws IOException {
+    private static String createEmptyFile(final String name) throws IOException {
         final Path input = DIR.resolve(name);
         Files.write(input, new byte[0]);
         return input.toString();
@@ -229,8 +228,8 @@ public class WalkTest extends BaseTest {
     }
 
     protected void test(final Collection<String> inputs, final Map<String, String> files) {
-        final Path inputFile = DIR.resolve(name.getMethodName() + ".in");
-        final Path outputFile = DIR.resolve(name.getMethodName() + ".out");
+        final Path inputFile = DIR.resolve(testMethodName + ".in");
+        final Path outputFile = DIR.resolve(testMethodName + ".out");
         try {
             Files.writeString(inputFile, generateInput(inputs));
         } catch (final IOException e) {

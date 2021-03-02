@@ -23,8 +23,13 @@ import java.util.function.Consumer;
 public class BaseTest {
     public static final String CUT_PROPERTY = "cut";
 
+    protected String testMethodName;
+
     @Rule
-    public TestRule watcher = watcher(description -> System.err.println("=== Running " + description.getMethodName()));
+    public TestRule watcher = watcher(description -> {
+        testMethodName = description.getMethodName();
+        System.err.println("=== Running " + testMethodName);
+    });
 
     protected static TestWatcher watcher(final Consumer<Description> watcher) {
         return new TestWatcher() {

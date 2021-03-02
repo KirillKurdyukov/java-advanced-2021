@@ -77,9 +77,8 @@ public class BaseTester {
         System.out.println("Usage:");
         for (final String name : tests.keySet()) {
             System.out.format(
-                    "    java -cp . -p . -m %s %s %s.class.name [salt]%n",
+                    "    java -cp . -p . -m %s %s Solution.class.name [salt]%n",
                     getClass().getPackage().getName(),
-                    name,
                     name
             );
         }
