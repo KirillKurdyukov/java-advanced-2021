@@ -31,7 +31,7 @@ public interface StudentQuery {
     /** Returns distinct student {@link Student#getFirstName() first names} in lexicographic order. */
     Set<String> getDistinctFirstNames(List<Student> students);
 
-    /** Returns a {@link Student#getFirstName() first name} of the student with minimal {@link Student#getId() id}. */
+    /** Returns a {@link Student#getFirstName() first name} of the student with maximal {@link Student#getId() id}. */
     String getMaxStudentFirstName(List<Student> students);
 
     /** Returns students ordered by {@link Student#getId() id}. */
