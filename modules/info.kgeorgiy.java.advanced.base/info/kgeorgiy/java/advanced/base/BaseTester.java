@@ -4,7 +4,7 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -15,7 +15,7 @@ import java.util.function.BiFunction;
  */
 public class BaseTester {
     private final long start = System.currentTimeMillis();
-    private final Map<String, BiFunction<BaseTester, String, Class<?>>> tests = new HashMap<>();
+    private final Map<String, BiFunction<BaseTester, String, Class<?>>> tests = new LinkedHashMap<>();
 
     public void run(final String[] args) {
         if (args.length != 2 && args.length != 3) {
