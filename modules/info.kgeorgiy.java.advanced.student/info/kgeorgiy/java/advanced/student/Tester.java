@@ -10,6 +10,7 @@ public class Tester extends BaseTester {
         new Tester()
                 .add("StudentQuery", StudentQueryTest.class)
                 .add("GroupQuery", GroupQueryTest.class)
+                .add("AdvancedQuery", AdvancedQueryTest.class)
                 .run(args);
     }
 }
