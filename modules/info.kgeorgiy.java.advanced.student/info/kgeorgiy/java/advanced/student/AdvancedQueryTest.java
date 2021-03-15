@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class AdvancedQueryTest extends GroupQueryTest_Full implements AdvancedQuery {
+public class AdvancedQueryTest extends GroupQueryTest implements AdvancedQuery {
     private static final int[] INDICES = RANDOM.ints(STUDENTS.size(), 0, STUDENTS.size()).toArray();
 
     private final AdvancedQuery db = createCUT();
