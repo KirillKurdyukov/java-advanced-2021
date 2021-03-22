@@ -4,7 +4,7 @@
  *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
-module info.kgeorgiy.java.advanced.implementor {
+open module info.kgeorgiy.java.advanced.implementor {
     requires transitive info.kgeorgiy.java.advanced.base;
 
     requires java.management;
@@ -15,11 +15,4 @@ module info.kgeorgiy.java.advanced.implementor {
     requires java.desktop;
 
     exports info.kgeorgiy.java.advanced.implementor;
-
-    opens info.kgeorgiy.java.advanced.implementor.basic.interfaces;
-    opens info.kgeorgiy.java.advanced.implementor.basic.interfaces.standard;
-    opens info.kgeorgiy.java.advanced.implementor.basic.classes;
-    opens info.kgeorgiy.java.advanced.implementor.basic.classes.standard;
-
-    opens info.kgeorgiy.java.advanced.implementor to junit;
 }
