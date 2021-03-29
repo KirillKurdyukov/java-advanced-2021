@@ -1,5 +1,7 @@
 package info.kgeorgiy.java.advanced.implementor;
 
+import info.kgeorgiy.java.advanced.implementor.full.lang.*;
+
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -19,6 +21,11 @@ public class InterfaceJarImplementorTest extends InterfaceImplementorTest {
     @Override
     public void test01_constructor() {
         assertConstructor(Impler.class, JarImpler.class);
+    }
+
+    @Test
+    public void test09_encoding() {
+        test(false, \u041f\u0440\u0438\u0432\u0435\u0442Interface.class);
     }
 
     @Override
