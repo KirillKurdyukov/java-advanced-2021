@@ -1,6 +1,7 @@
 package info.kgeorgiy.java.advanced.implementor;
 
 import info.kgeorgiy.java.advanced.base.BaseTester;
+import info.kgeorgiy.java.advanced.implementor.full.interfaces.CovariantReturns;
 
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
@@ -14,6 +15,7 @@ public class Tester extends BaseTester {
                 .add("covariant", CovariantImplementorTest.class)
                 .add("jar-interface", InterfaceJarImplementorTest.class)
                 .add("jar-class", ClassJarImplementorTest.class)
+                .add("jar-advanced", AdvancedJarImplementorTest.class)
                 .run(args);
     }
 }
