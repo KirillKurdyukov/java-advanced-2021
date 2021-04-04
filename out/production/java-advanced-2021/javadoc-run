@@ -1,0 +1,4 @@
+#!/bin/bash
+link="https://docs.oracle.com/en/java/javase/11/docs/api/"
+javadoc -private -link $link -cp ../artifacts/info.kgeorgiy.java.advanced.implementor.jar \
+ -d ../javadoc info/kgeorgiy/ja/kurdyukov/jarimplementor/Implementor.java

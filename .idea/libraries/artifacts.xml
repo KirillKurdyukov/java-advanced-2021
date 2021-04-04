@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="artifacts">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.walk.jar!/" />
+      <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.base.jar!/" />
+      <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.student.jar!/" />
+      <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.implementor.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.walk.jar!/" />
+    </SOURCES>
+  </library>
+</component>
