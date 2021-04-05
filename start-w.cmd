@@ -1,1 +1,1 @@
-java -cp "out/production/java-advanced-2021" -p "artifacts";"lib" -m info.kgeorgiy.java.advanced.implementor jar-class info.kgeorgiy.ja.kurdyukov.jarimplementor.Implementor "S_BOGOM"
+java -cp "out/production/java-advanced-2021" -p "artifacts";"lib" -m info.kgeorgiy.java.advanced.implementor jar-advanced info.kgeorgiy.ja.kurdyukov.jarimplementor.Implementor "S_BOGOM"

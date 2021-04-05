@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"info.kgeorgiy.ja.kurdyukov.jarimplementor"}]
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"info.kgeorgiy.ja.kurdyukov.jarimplementor"},{"l":"info.kgeorgiy.java.advanced.implementor"}]
