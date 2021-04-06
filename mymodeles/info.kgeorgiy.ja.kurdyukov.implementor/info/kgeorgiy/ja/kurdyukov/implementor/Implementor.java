@@ -1,4 +1,4 @@
-package info.kgeorgiy.ja.kurdyukov.jarimplementor;
+package info.kgeorgiy.ja.kurdyukov.implementor;
 
 import info.kgeorgiy.java.advanced.implementor.*;
 
@@ -74,10 +74,10 @@ public class Implementor implements JarImpler {
     private static final String CLASS = ".class";
 
     /**
-     * Checks that the specified arguments is not <i>null</i>.
+     * Checks that the specified arguments is not <tt>null</tt>.
      *
-     * @param args are specified arguments to check for <i>null</i>.
-     * @throws ImplerException when any argument is <i>null</i>.
+     * @param args are specified arguments to check for <tt>null</tt>.
+     * @throws ImplerException when any argument is <tt>null</tt>.
      */
     private void checkArguments(Object... args) throws ImplerException {
         for (var arg : args) {
@@ -90,7 +90,7 @@ public class Implementor implements JarImpler {
      * Generated correct {@link String} java code enumeration of parameters with type or without type argument.
      *
      * <p>
-     * Method takes specified array of {@link Class}. It's type <i>tokens</i> of parameters.
+     * Method takes specified array of {@link Class}. It's type <tt>tokens</tt> of parameters.
      * And generated correct java code: enumeration of parameters with type or without type argument.
      * How in signature of method or constructor.
      * </p>
@@ -100,7 +100,7 @@ public class Implementor implements JarImpler {
      * </p>
      *
      * @param params are array of {@link Class}.
-     * @param flag   is <i>true</i> then generated with type argument else without.
+     * @param flag   is <tt>true</tt> then generated with type argument else without.
      * @return correct for compilation java code {@link String} parameters.
      */
     private String generateParams(Class<?>[] params, boolean flag) {
@@ -114,10 +114,10 @@ public class Implementor implements JarImpler {
      * Generated correct java code {@link String} implements body of the specified {@link Method}.
      *
      * <p>
-     * If specified {@link Method} return <i>void.class token</i> then java code implemented
-     * this method is {@code ""}. Else if <i>return type token</i> is primitive, then if this primitive
-     * <i>type token == boolean.class</i> then code implemented this method is {@code return false;}
-     * for other primitives {@code return 0;}. If specified {@link Method} return not primitive <i>token</i>.
+     * If specified {@link Method} return <tt>void.class token</tt> then java code implemented
+     * this method is {@code ""}. Else if <tt>return type token</tt> is primitive, then if this primitive
+     * <tt>type token == boolean.class</tt> then code implemented this method is {@code return false;}
+     * for other primitives {@code return 0;}. If specified {@link Method} return not primitive <tt>token</tt>.
      * Java code implemented this method is {@code return null;}.
      *
      * </p>
@@ -149,11 +149,11 @@ public class Implementor implements JarImpler {
      *     <li>Enumeration of exceptions == {@link Implementor#generateThrowException}</li>
      *     <li>Body of this method == {@link Implementor#implMethod}</li>
      * </ul>
+     * </p>
      *
-     *
-     *
-     * Example: {@code public Object action(java.lang.Object a0, java.lang.String a1) { return null; }}
-     *
+     * <p>
+     *     Example: {@code public Object action(java.lang.Object a0, java.lang.String a1) { return null; }}
+     * </p>
      *
      * @param method is {@link Method} to implement.
      * @return {@link String} fully implements specified {@link Method}.
@@ -180,7 +180,7 @@ public class Implementor implements JarImpler {
      *
      * <p>
      * If specified {@link Executable} don't have exceptions then java code implemented this exceptions
-     * is <code>""</code>. Else exceptions separated by a comma, after world <i>throws</i>.
+     * is <code>""</code>. Else exceptions separated by a comma, after world <tt>throws</tt>.
      * </p>
      *
      * <p>
@@ -215,10 +215,11 @@ public class Implementor implements JarImpler {
      *         <li>Enumeration of exceptions == {@link Implementor#generateThrowException}</li>
      *         <li>Body of this constructor == super({@link Implementor#generateParams} with flag == false)</li>
      *     </ul>
+     * </p>
      *
-     *
+     * <p>
      *     Example: <code>public ExampleImpl(Object a0) throws {@link IOException} { super(a0);}</code>
-     *
+     * </p>
      *
      * @param constructor is {@link Constructor} to implement.
      * @return {@link String} fully implements specified {@link Constructor}
@@ -252,8 +253,6 @@ public class Implementor implements JarImpler {
 
         /**
          * Constructor of the wrapper class over the specified method.
-         *
-         * @param method for wrapper.
          */
         public MethodSignature(Method method) {
             this.method = method;
@@ -280,7 +279,7 @@ public class Implementor implements JarImpler {
          *
          * <p>
          * If specified <code>object != wrapper</code> return false.
-         * Comparison first by {@link Class} of parameters <i>tokens</i> and
+         * Comparison first by {@link Class} of parameters <tt>tokens</tt> and
          * compare {@link Method#getName()}.
          * </p>
          *
@@ -301,10 +300,10 @@ public class Implementor implements JarImpler {
 
     /**
      * Generated correct java code {@link String} that implements all {@link Method}
-     * the specified <i>aClass</i> and all of his ancestors.
+     * the specified <tt>aClass</tt> and all of his ancestors.
      *
      * <p>
-     * All methods <i>class token</i> and his ancestors put in HashSet wrappers
+     * All methods <tt>class token</tt> and his ancestors put in HashSet wrappers
      * over {@link Method} for correct compare of method. Not public methods get
      * climbing the parse tree and calling {@link Class#getDeclaredMethods()}.
      * </p>
@@ -334,10 +333,10 @@ public class Implementor implements JarImpler {
 
     /**
      * Generated correct java code {@link String} that implements all {@link Constructor}
-     * the specified <i>aClass</i>.
+     * the specified <tt>aClass</tt>.
      *
      * <p>
-     * If {@link Class} <i>aClass == Interface</i> then java code implemented constructors
+     * If {@link Class} <tt>aClass == Interface</tt> then java code implemented constructors
      * is <code>""</code>. Else all not private constructors implemented {@link Implementor#generateConstructor}
      * and append in {@link StringBuilder}.
      * </p>
@@ -362,7 +361,7 @@ public class Implementor implements JarImpler {
 
     /**
      * Generated correct java code {@link String} that implements {@link Package}
-     * the specified <i>aClass</i> {@link Class}.
+     * the specified <tt>aClass</tt> {@link Class}.
      *
      * <p>
      * If {@link Class#getPackageName()} == "" then java code implements this package
@@ -381,18 +380,18 @@ public class Implementor implements JarImpler {
 
     /**
      * Generated correct java code {@link String} that implements header the
-     * specified <i>aClass</i> {@link Class}.
+     * specified <tt>aClass</tt> {@link Class}.
      *
      * <p>
      * Header class implemented will have:
      *      <ul>
      *          <li>access identifier is public</li>
      *          <li>Name of header == {@link Class#getSimpleName() + Impl.java}</li>
-     *          <li>if <i>aClass</i> is interface then generated class implements {@link Class}
+     *          <li>if <tt>aClass</tt> is interface then generated class implements {@link Class}
      *          else extends</li>
      *          <li>Name of the implemented class == {@link Class#getCanonicalName()}</li>
      *      </ul>
-     *
+     * </p>
      *
      * @param aClass is {@link Class} to implement.
      * @return {@link String} is package.
@@ -412,7 +411,7 @@ public class Implementor implements JarImpler {
      *
      * @param path is root path {@link Path}.
      * @param aClass is {@link Class} to implement.
-     * @param suffix given information about it's <i>file.java</i> or <i>class.file</i>.
+     * @param suffix given information about it's <tt>file.java</tt> or <tt>class.file</tt>.
      * @return {@link Path} where write new file.
      */
     private Path createOutPath(Path path, Class<?> aClass, String suffix) {
@@ -438,7 +437,7 @@ public class Implementor implements JarImpler {
     }
 
     /**
-     * Generated java file implements the specified <i>aClass</i> and
+     * Generated java file implements the specified <tt>aClass</tt> and
      * puts in the {@link Path} with name is {@link Class#getSimpleName()} + Impl.
      *
      *
@@ -447,12 +446,12 @@ public class Implementor implements JarImpler {
      * @param path where to generate the implementation.
      * @throws ImplerException when:
      * <ul>
-     *     <li><i>aClass == null or path == null</i></li>
-     *     <li><i>aClass == Primitive</i></li>
-     *     <li><i>aClass == Array</i></li>
-     *     <li><i>aClass == Final class</i></li>
-     *     <li><i>aClass == Private class or interface</i></li>
-     *     <li><i>aClass == Enum.class</i></li>
+     *     <li><tt>aClass == null or path == null</tt></li>
+     *     <li><tt>aClass == Primitive</tt></li>
+     *     <li><tt>aClass == Array</tt></li>
+     *     <li><tt>aClass == Final class</tt></li>
+     *     <li><tt>aClass == Private class or interface</tt></li>
+     *     <li><tt>aClass == Enum.class</tt></li>
      * </ul>
      */
     @Override
@@ -471,8 +470,8 @@ public class Implementor implements JarImpler {
             bufferedWriter.write ((generateHeader(aClass)
                     + implConstructors(aClass)
                     + implMethods(aClass)
-                    + CLOSE_BRACKET).chars()
-                    .mapToObj(c -> String.format("\\u%04x", c))
+                    + CLOSE_BRACKET).codePoints()
+            .mapToObj(c -> String.format("\\u%04x", c))
                     .collect(Collectors.joining()));
         } catch (IOException e) {
             throw new ImplerException("Error to create file.java");
@@ -480,14 +479,14 @@ public class Implementor implements JarImpler {
     }
 
     /**
-     * Generated jar file with file.class that implements the specified <i>aClass</i>
+     * Generated jar file with file.class that implements the specified <tt>aClass</tt>
      * puts in the {@link Path}.
      *
      * @param aClass aClass is {@link Class} to implement.
      * @param path where to generate the jar.file.
      * @throws ImplerException when:
      * <ul>
-     *     <li><i>aClass == null or path == null</i></li>
+     *     <li><tt>aClass == null or path == null</tt></li>
      *     <li>Can't create temporary directory.</li>
      *     <li>Can't find java compiler.</li>
      *     <li>Can't compile generated class.</li>
@@ -507,8 +506,28 @@ public class Implementor implements JarImpler {
         }
         try {
             implement(aClass, tempDirectory);
-            compile(aClass, tempDirectory);
-            outputJar(aClass, path, tempDirectory);
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            if (compiler == null)
+                throw new ImplerException("Can't find java compiler.");
+            String[] args;
+            try {
+                args = new String[]{"-cp",
+                        Path.of(aClass.getProtectionDomain().getCodeSource().getLocation().toURI()).toString(),
+                        createOutPath(tempDirectory, aClass, JAVA).toString()
+                };
+            } catch (URISyntaxException e) {
+                throw new ImplerException("Can't compile generated class.");
+            }
+            int exit_code = compiler.run(null, null, null, args);
+            if (exit_code != 0)
+                throw new ImplerException("Generated class with compilation wrongs.");
+            try (ZipOutputStream jarOutputStream = new ZipOutputStream(Files.newOutputStream(path))) {
+                jarOutputStream.putNextEntry(new ZipEntry(aClass.getPackageName().replace(".", "/")
+                        .concat("/" + aClass.getSimpleName() + IMPL + CLASS)));
+                Files.copy(createOutPath(tempDirectory, aClass, CLASS), jarOutputStream);
+            } catch (IOException e) {
+                throw new ImplerException("Error writing to jar-file.");
+            }
         } finally {
             try {
                 assert tempDirectory != null;
@@ -517,52 +536,6 @@ public class Implementor implements JarImpler {
                 System.out.println("Can't delete temp directory");
             }
         }
-    }
-
-    /**
-     * v padlu
-     * @param aClass s
-     * @param path s
-     * @param tempDirectory s
-     * @throws ImplerException s
-     */
-    private void outputJar(Class<?> aClass, Path path, Path tempDirectory) throws ImplerException {
-        try (ZipOutputStream jarOutputStream = new ZipOutputStream(Files.newOutputStream(path))) {
-            jarOutputStream.putNextEntry(new ZipEntry(aClass.getPackageName().replace(".", "/")
-                    .concat("/" + aClass.getSimpleName() + IMPL + CLASS)));
-            Files.copy(createOutPath(tempDirectory, aClass, CLASS), jarOutputStream);
-        } catch (IOException e) {
-            throw new ImplerException("Error writing to jar-file.");
-        }
-    }
-
-    /**
-     * love Java
-     * @param aClass kek
-     * @param tempDirectory lol
-     * @throws ImplerException puk
-     */
-    private void compile(Class<?> aClass, Path tempDirectory) throws ImplerException {
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        if (compiler == null)
-            throw new ImplerException("Can't find java compiler.");
-        String[] args;
-        try {
-            args = new String[]{"-cp",
-                    Path.of(aClass
-                            .getProtectionDomain()
-                            .getCodeSource()
-                            .getLocation()
-                            .toURI())
-                            .toString(),
-                    createOutPath(tempDirectory, aClass, JAVA).toString()
-            };
-        } catch (URISyntaxException e) {
-            throw new ImplerException("Can't compile generated class.");
-        }
-        int exit_code = compiler.run(null, null, null, args);
-        if (exit_code != 0)
-            throw new ImplerException("Generated class with compilation wrongs.");
     }
 
     /**
