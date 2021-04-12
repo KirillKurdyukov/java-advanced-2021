@@ -10,6 +10,7 @@ public class Tester extends BaseTester {
         new Tester()
                 .add("scalar", ScalarIPTest.class)
                 .add("list", ListIPTest.class)
+                .add("advanced", AdvancedIPTest.class)
                 .run(args);
     }
 }
