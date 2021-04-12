@@ -19,10 +19,17 @@
    Класс должен реализовывать интерфейс
    [ListIP](modules/info.kgeorgiy.java.advanced.concurrent/info/kgeorgiy/java/advanced/concurrent/ListIP.java).
 
+ * продвинутый вариант:
+   ```info.kgeorgiy.java.advanced.concurrent advanced <полное имя класса>```
+
+   Класс должен реализовывать интерфейс
+   [AdvancedIP](modules/info.kgeorgiy.java.advanced.concurrent/info/kgeorgiy/java/advanced/concurrent/AdvancedIP.java).
+
 Исходный код тестов:
 
 * [простой вариант](modules/info.kgeorgiy.java.advanced.concurrent/info/kgeorgiy/java/advanced/concurrent/ScalarIPTest.java)
 * [сложный вариант](modules/info.kgeorgiy.java.advanced.concurrent/info/kgeorgiy/java/advanced/concurrent/ListIPTest.java)
+* [продвинутый вариант](modules/info.kgeorgiy.java.advanced.concurrent/info/kgeorgiy/java/advanced/concurrent/AdvancedIPTest.java)
 
 
 ## Домашнее задание 5. JarImplementor
