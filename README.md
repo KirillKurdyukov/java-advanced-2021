@@ -2,6 +2,20 @@
 
 [Условия домашних заданий](https://www.kgeorgiy.info/courses/java-advanced/homeworks.html)
 
+## Домашнее задание 6. Параллельный запуск
+
+Тестирование
+
+ * простой вариант:
+    ```info.kgeorgiy.java.advanced.mapper scalar <полное имя класса>```
+ * сложный вариант:
+    ```info.kgeorgiy.java.advanced.mapper list <полное имя класса>```
+
+Исходный код тестов:
+
+* [простой вариант](modules/info.kgeorgiy.java.advanced.mapper/info/kgeorgiy/java/advanced/mapper/ScalarMapperTest.java)
+* [сложный вариант](modules/info.kgeorgiy.java.advanced.mapper/info/kgeorgiy/java/advanced/mapper/ListMapperTest.java)
+
 
 ## Домашнее задание 5. JarImplementor
 
