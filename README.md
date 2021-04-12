@@ -2,22 +2,27 @@
 
 [Условия домашних заданий](https://www.kgeorgiy.info/courses/java-advanced/homeworks.html)
 
-## Домашнее задание 6. Параллельный запуск
+
+## Домашнее задание 7. Итеративный параллелизм
 
 Тестирование
 
  * простой вариант:
-    ```info.kgeorgiy.java.advanced.mapper scalar <полное имя класса>```
+   ```info.kgeorgiy.java.advanced.concurrent scalar <полное имя класса>```
+
+   Класс должен реализовывать интерфейс
+   [ScalarIP](modules/info.kgeorgiy.java.advanced.concurrent/info/kgeorgiy/java/advanced/concurrent/ScalarIP.java).
+
  * сложный вариант:
-    ```info.kgeorgiy.java.advanced.mapper list <полное имя класса>```
- * продвинутый вариант:
-    ```info.kgeorgiy.java.advanced.mapper advanced <полное имя класса>```
+   ```info.kgeorgiy.java.advanced.concurrent list <полное имя класса>```
+
+   Класс должен реализовывать интерфейс
+   [ListIP](modules/info.kgeorgiy.java.advanced.concurrent/info/kgeorgiy/java/advanced/concurrent/ListIP.java).
 
 Исходный код тестов:
 
-* [простой вариант](modules/info.kgeorgiy.java.advanced.mapper/info/kgeorgiy/java/advanced/mapper/ScalarMapperTest.java)
-* [сложный вариант](modules/info.kgeorgiy.java.advanced.mapper/info/kgeorgiy/java/advanced/mapper/ListMapperTest.java)
-* [продвинутый вариант](modules/info.kgeorgiy.java.advanced.mapper/info/kgeorgiy/java/advanced/mapper/AdvancedMapperTest.java)
+* [простой вариант](modules/info.kgeorgiy.java.advanced.concurrent/info/kgeorgiy/java/advanced/concurrent/ScalarIPTest.java)
+* [сложный вариант](modules/info.kgeorgiy.java.advanced.concurrent/info/kgeorgiy/java/advanced/concurrent/ListIPTest.java)
 
 
 ## Домашнее задание 5. JarImplementor
