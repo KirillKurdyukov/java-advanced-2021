@@ -19,7 +19,7 @@ import java.util.stream.Stream;
  */
 public class BaseIPTest<P extends ScalarIP> extends BaseTest {
     public static final List<Integer> SIZES = List.of(10_000, 5, 2, 1);
-    private final Random random = new Random(5243087503287532587L);
+    private final Random random = new Random(3257083275083275083L);
     protected List<Integer> factors = Collections.singletonList(0);
 
     protected final <T, U> void test(final BiFunction<List<Integer>, U, T> fExpected, final ConcurrentFunction<P, T, U> fActual, final List<Named<U>> cases) throws InterruptedException {
@@ -74,15 +74,25 @@ public class BaseIPTest<P extends ScalarIP> extends BaseTest {
     }
 
     protected static final List<Named<Comparator<Integer>>> COMPARATORS = List.of(
-            named("Reverse order", Comparator.reverseOrder())
+            named("Natural order", Integer::compare),
+            named("Reverse order", (l1, l2) -> Integer.compare(l2, l1)),
+            named("Div 100", Comparator.comparingInt(v -> v / 100)),
+            named("Even first", Comparator.<Integer>comparingInt(v -> v % 2).thenComparing(v -> v)),
+            named("All equal", (v1, v2) -> 0)
     );
 
     protected static final List<Named<Predicate<Integer>>> PREDICATES = List.of(
-            named("Greater than 0", i -> i > 0)
+            named("Equal 0", Predicate.isEqual(0)),
+            named("Greater than 0", i -> i > 0),
+            named("Even", i -> i % 2 == 0),
+            named("True", i -> true),
+            named("False", i -> false)
     );
 
     protected static final List<Named<Function<Integer, ?>>> FUNCTIONS = List.of(
-            named("* 2", v -> v * 2)
+            named("* 2", v -> v * 2),
+            named("is even", v -> v % 2 == 0),
+            named("toString", Object::toString)
     );
 
     protected static final List<Named<Void>> UNIT = List.of(named("Common", null));
