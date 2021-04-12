@@ -52,7 +52,7 @@ public class IterativeParallelism implements ListIP {
                 l -> l.stream()
                         .filter(predicate))
                 .stream()
-                .flatMap(l -> l)
+                .flatMap(Function.identity())
                 .collect(Collectors.toList());
     }
 
@@ -63,7 +63,7 @@ public class IterativeParallelism implements ListIP {
                 l -> l.stream()
                         .map(function))
                 .stream()
-                .flatMap(l -> l)
+                .flatMap(Function.identity())
                 .collect(Collectors.toList());
     }
 

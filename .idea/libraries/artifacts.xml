@@ -1,11 +1,12 @@
 <component name="libraryTable">
   <library name="artifacts">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.walk.jar!/" />
+      <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.arrayset.jar!/" />
       <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.base.jar!/" />
-      <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.student.jar!/" />
-      <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.implementor.jar!/" />
       <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.concurrent.jar!/" />
+      <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.implementor.jar!/" />
+      <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.student.jar!/" />
+      <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.walk.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
