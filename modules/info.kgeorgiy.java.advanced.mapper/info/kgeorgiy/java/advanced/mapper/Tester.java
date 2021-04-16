@@ -1,4 +1,4 @@
-package info.kgeorgiy.java.advanced.concurrent;
+package info.kgeorgiy.java.advanced.mapper;
 
 import info.kgeorgiy.java.advanced.base.BaseTester;
 
@@ -8,9 +8,8 @@ import info.kgeorgiy.java.advanced.base.BaseTester;
 public class Tester extends BaseTester {
     public static void main(final String... args) {
         new Tester()
-                .add("scalar", ScalarIPTest.class)
-                .add("list", ListIPTest.class)
-                .add("advanced", AdvancedIPTest.class)
+                .add("scalar", ScalarMapperTest.class)
+                .add("list", ListMapperTest.class)
                 .run(args);
     }
 }
