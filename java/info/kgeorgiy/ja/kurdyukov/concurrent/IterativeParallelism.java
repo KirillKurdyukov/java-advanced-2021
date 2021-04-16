@@ -6,12 +6,14 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class IterativeParallelism implements ListIP {
 
-    private <T, U> List<U> getParallelResult(int threadSize,
-                                             List<? extends T> list,
-                                             Function<List<? extends T>, U> function) throws InterruptedException {
+    private <T, U, R> R getParallelResult(int threadSize,
+                                          List<? extends T> list,
+                                          Function<List<? extends T>, U> function,
+                                          Function<List<U>, R> reduceFunction) throws InterruptedException {
         int blockSize = list.size() / threadSize;
         int remainder = list.size() % threadSize;
         threadSize = Math.min(threadSize, list.size());
@@ -26,85 +28,87 @@ public class IterativeParallelism implements ListIP {
             int finalRight = right;
             Thread thread = new Thread(() -> {
                 U resCurrent = function.apply(list.subList(finalLeft, finalRight));
-                synchronized (resultParallel) {
-                    resultParallel.set(finalI, resCurrent);
-                }
+                resultParallel.set(finalI, resCurrent);
             });
             thread.start();
             threads.add(thread);
         }
         for (var thread : threads)
             thread.join();
-        return resultParallel;
+        return reduceFunction.apply(resultParallel);
     }
+
 
     /**
      * Creates and returns a string of elements in the specified list.
      *
      * @param threadsSize is maximum number of created threads to implement the method.
-     * @param list is list of elements.
+     * @param list        is list of elements.
      * @return {@link String} is element string.
      * @throws InterruptedException when any thread is interrupted.
      */
     @Override
     public String join(int threadsSize, List<?> list) throws InterruptedException {
-        return String.join("", getParallelResult(threadsSize,
+        return getParallelResult(threadsSize,
                 list,
                 l -> l.stream()
                         .map(Object::toString)
-                        .collect(Collectors.joining())));
+                        .collect(Collectors.joining()),
+                l -> String.join("", l));
     }
 
+    private <T, U> List<U> noMonoid(int threadsSize,
+                                    List<? extends T> list,
+                                    Function<Stream<? extends T>, Stream<? extends U>> function) throws InterruptedException {
+        return getParallelResult(threadsSize,
+                list,
+                l -> function.apply(l.stream()),
+                l -> l.stream()
+                        .flatMap(Function.identity())
+                        .collect(Collectors.toList()));
+    }
     /**
      * Filters the specified list.
      *
      * @param threadsSize is maximum number of created threads to implement the method.
-     * @param list is list of elements.
-     * @param predicate is filter predicate.
-     * @param <T> is specified list type.
+     * @param list        is list of elements.
+     * @param predicate   is filter predicate.
+     * @param <T>         is specified list type.
      * @return filtered list.
      * @throws InterruptedException when any thread is interrupted.
      */
     @Override
     public <T> List<T> filter(int threadsSize, List<? extends T> list, Predicate<? super T> predicate) throws InterruptedException {
-        return getParallelResult(threadsSize,
+        return noMonoid(threadsSize,
                 list,
-                l -> l.stream()
-                        .filter(predicate))
-                .stream()
-                .flatMap(Function.identity())
-                .collect(Collectors.toList());
+                l -> l.filter(predicate));
     }
 
     /**
      * Applies the specified function to all elements in the specified list and returns a new list.
      *
      * @param threadsSize is maximum number of created threads to implement the method.
-     * @param list is list of elements.
-     * @param function is function for element. <i>T -> U</i>
-     * @param <T> is type of specified list.
-     * @param <U> is type of new list.
+     * @param list        is list of elements.
+     * @param function    is function for element. <i>T -> U</i>
+     * @param <T>         is type of specified list.
+     * @param <U>         is type of new list.
      * @return new list.
      * @throws InterruptedException when any thread is interrupted.
      */
     @Override
     public <T, U> List<U> map(int threadsSize, List<? extends T> list, Function<? super T, ? extends U> function) throws InterruptedException {
-        return getParallelResult(threadsSize,
+        return noMonoid(threadsSize,
                 list,
-                l -> l.stream()
-                        .map(function))
-                .stream()
-                .flatMap(l -> l)
-                .collect(Collectors.toList());
+                l -> l.map(function));
     }
 
     /**
      * Finds the maximum element in the specified list.
      *
      * @param threadSize is maximum number of created threads to implement the method.
-     * @param list is list of elements.
+     * @param list       is list of elements.
      * @param comparator is comparator for comparison elements.
-     * @param <T> is type of specified list.
+     * @param <T>        is type of specified list.
      * @return maximum element.
      * @throws InterruptedException when any thread is interrupted.
      */
@@ -114,19 +118,19 @@ public class IterativeParallelism implements ListIP {
                 list,
                 l -> l.stream()
                         .max(comparator)
-                        .orElseThrow())
-                .stream()
-                .max(comparator)
-                .orElseThrow();
+                        .orElseThrow(),
+                l -> l.stream()
+                        .max(comparator)
+                        .orElseThrow());
     }
 
     /**
      * Finds the minimum element in the specified list.
      *
      * @param threadSize is minimum number of created threads to implement the method.
-     * @param list is list of elements.
+     * @param list       is list of elements.
      * @param comparator is comparator for comparison elements.
-     * @param <T> is type of specified list.
+     * @param <T>        is type of specified list.
      * @return minimum element.
      * @throws InterruptedException when any thread is interrupted.
      */
@@ -139,9 +143,9 @@ public class IterativeParallelism implements ListIP {
      * Checks if all the elements of the specified list match a predicate.
      *
      * @param threadSize is maximum number of created threads to implement the method.
-     * @param list is list of elements.
-     * @param predicate is predicate for check.
-     * @param <T> is type of specified list.
+     * @param list       is list of elements.
+     * @param predicate  is predicate for check.
+     * @param <T>        is type of specified list.
      * @return result check is true or false.
      * @throws InterruptedException when any thread is interrupted.
      */
@@ -150,19 +154,18 @@ public class IterativeParallelism implements ListIP {
         return getParallelResult(threadSize,
                 list,
                 l -> l.stream()
-                        .allMatch(predicate))
-                .stream()
-                .reduce(Boolean::logicalAnd)
-                .orElseThrow();
+                        .allMatch(predicate),
+                l -> l.stream()
+                        .allMatch(Boolean::booleanValue));
     }
 
     /**
      * Checks if any the elements of the specified list match a predicate.
      *
      * @param threadSize is maximum number of created threads to implement the method.
-     * @param list is list of elements.
-     * @param predicate is predicate for check.
-     * @param <T> is type of specified list.
+     * @param list       is list of elements.
+     * @param predicate  is predicate for check.
+     * @param <T>        is type of specified list.
      * @return result check is true or false.
      * @throws InterruptedException when any thread is interrupted.
      */
