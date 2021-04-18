@@ -1,43 +1,80 @@
 package info.kgeorgiy.ja.kurdyukov.concurrent;
 
 import info.kgeorgiy.java.advanced.concurrent.ListIP;
+import info.kgeorgiy.java.advanced.mapper.ParallelMapper;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class IterativeParallelism implements ListIP {
 
-    private <T, U, R> R getParallelResult(int threadSize,
-                                          List<? extends T> list,
-                                          Function<List<? extends T>, U> function,
-                                          Function<List<U>, R> reduceFunction) throws InterruptedException {
+    private ParallelMapper mapper;
+
+    public IterativeParallelism() {
+
+    }
+
+    public IterativeParallelism(ParallelMapper mapper) {
+        this.mapper = mapper;
+    }
+
+    private <T> List<List<? extends T>> getBlocks(int threadSize, List<? extends T> list) {
+        List<List<? extends T>> lists = new ArrayList<>();
         int blockSize = list.size() / threadSize;
         int remainder = list.size() % threadSize;
         threadSize = Math.min(threadSize, list.size());
-        List<U> resultParallel = new ArrayList<>(Collections.nCopies(threadSize, null));
         List<Thread> threads = new ArrayList<>();
         int left, right = 0;
         for (int i = 0; i < threadSize; i++) {
             left = right;
             right = left + blockSize + (remainder-- > 0 ? 1 : 0);
-            int finalI = i;
             int finalLeft = left;
             int finalRight = right;
-            Thread thread = new Thread(() -> {
-                U resCurrent = function.apply(list.subList(finalLeft, finalRight));
-                resultParallel.set(finalI, resCurrent);
-            });
-            thread.start();
-            threads.add(thread);
+            lists.add(list.subList(finalLeft, finalRight));
         }
-        for (var thread : threads)
-            thread.join();
+        return lists;
+    }
+
+    private <T, U, R> R getParallelResult(int threadSize,
+                                          List<? extends T> list,
+                                          Function<List<? extends T>, U> function,
+                                          Function<List<U>, R> reduceFunction) throws InterruptedException {
+        List<List<? extends T>> blocks = getBlocks(threadSize, list);
+        List<Thread> threads = new ArrayList<>();
+        List<U> resultParallel = new ArrayList<>(Collections.nCopies(threadSize, null));
+        if (mapper == null) {
+            List<U> finalResultParallel = resultParallel;
+            IntStream.range(0, threadSize).forEach(i -> {
+                Thread thread = new Thread(() -> {
+                    U resCurrent = function.apply(blocks.get(i));
+                    finalResultParallel.set(i, resCurrent);
+                });
+                thread.start();
+                threads.add(thread);
+            });
+            joinThreads(threads);
+        } else {
+            try {
+                resultParallel = mapper.map(function, blocks);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         return reduceFunction.apply(resultParallel);
     }
 
+    public static void joinThreads(List<Thread> threads) {
+        threads.forEach(thread -> {
+            try {
+                thread.join();
+            } catch (InterruptedException ignored) {
+            }
+        });
+    }
 
     /**
      * Creates and returns a string of elements in the specified list.
@@ -67,6 +104,7 @@ public class IterativeParallelism implements ListIP {
                         .flatMap(Function.identity())
                         .collect(Collectors.toList()));
     }
+
     /**
      * Filters the specified list.
      *
