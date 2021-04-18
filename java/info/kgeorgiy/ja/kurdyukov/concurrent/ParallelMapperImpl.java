@@ -87,6 +87,7 @@ public class ParallelMapperImpl implements ParallelMapper {
         IterativeParallelism.joinThreads(threads);
     }
 
+    /*
     public static void main(String[] args) throws InterruptedException {
         ParallelMapperImpl p = new ParallelMapperImpl(3);
         List<Integer> list = List.of(3, 5, 6, 6, 1, 1,1, 1,1 ,1, 1);
@@ -110,5 +111,5 @@ public class ParallelMapperImpl implements ParallelMapper {
             p.close();
         } catch (InterruptedException ignored) {
         }
-    }
+    } */
 }

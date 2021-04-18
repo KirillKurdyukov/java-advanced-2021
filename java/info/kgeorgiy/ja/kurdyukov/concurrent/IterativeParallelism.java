@@ -27,7 +27,6 @@ public class IterativeParallelism implements ListIP {
         int blockSize = list.size() / threadSize;
         int remainder = list.size() % threadSize;
         threadSize = Math.min(threadSize, list.size());
-        List<Thread> threads = new ArrayList<>();
         int left, right = 0;
         for (int i = 0; i < threadSize; i++) {
             left = right;
