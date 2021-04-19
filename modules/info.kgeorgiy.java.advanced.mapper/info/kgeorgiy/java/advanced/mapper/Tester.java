@@ -10,6 +10,7 @@ public class Tester extends BaseTester {
         new Tester()
                 .add("scalar", ScalarMapperTest.class)
                 .add("list", ListMapperTest.class)
+                .add("advanced", AdvancedMapperTest.class)
                 .run(args);
     }
 }

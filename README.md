@@ -11,11 +11,14 @@
     ```info.kgeorgiy.java.advanced.mapper scalar <полное имя класса>```
  * сложный вариант:
     ```info.kgeorgiy.java.advanced.mapper list <полное имя класса>```
+ * продвинутый вариант:
+    ```info.kgeorgiy.java.advanced.mapper advanced <полное имя класса>```
 
 Исходный код тестов:
 
 * [простой вариант](modules/info.kgeorgiy.java.advanced.mapper/info/kgeorgiy/java/advanced/mapper/ScalarMapperTest.java)
 * [сложный вариант](modules/info.kgeorgiy.java.advanced.mapper/info/kgeorgiy/java/advanced/mapper/ListMapperTest.java)
+* [продвинутый вариант](modules/info.kgeorgiy.java.advanced.mapper/info/kgeorgiy/java/advanced/mapper/AdvancedMapperTest.java)
 
 
 ## Домашнее задание 7. Итеративный параллелизм
