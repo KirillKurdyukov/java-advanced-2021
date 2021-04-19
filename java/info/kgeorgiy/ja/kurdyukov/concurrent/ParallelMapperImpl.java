@@ -87,6 +87,8 @@ public class ParallelMapperImpl implements ParallelMapper {
         IterativeParallelism.joinThreads(threads);
     }
 
+    
+
     /*
     public static void main(String[] args) throws InterruptedException {
         ParallelMapperImpl p = new ParallelMapperImpl(3);
