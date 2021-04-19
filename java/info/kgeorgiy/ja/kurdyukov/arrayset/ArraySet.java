@@ -127,13 +127,11 @@ public class ArraySet<E> extends AbstractSet<E> implements NavigableSet<E> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public boolean contains(Object o) {
         return Collections.binarySearch(arraySet, (E) o, comparator) >= 0;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Iterator<E> iterator() {
         return (Iterator<E>) arraySet.iterator();
     }
@@ -206,13 +204,15 @@ public class ArraySet<E> extends AbstractSet<E> implements NavigableSet<E> {
 
     @Override
     public E first() {
-        if (isEmpty()) throw new NoSuchElementException();
+        if (isEmpty())
+            throw new NoSuchElementException();
         return arraySet.get(0);
     }
 
     @Override
     public E last() {
-        if (isEmpty()) throw new NoSuchElementException();
+        if (isEmpty())
+            throw new NoSuchElementException();
         return arraySet.get(size - 1);
     }
 

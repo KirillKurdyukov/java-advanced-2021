@@ -1,1 +1,1 @@
-java -cp "out/production/java-advanced-2021" -p "artifacts";"lib" -m info.kgeorgiy.java.advanced.mapper list info.kgeorgiy.ja.kurdyukov.concurrent.IterativeParallelism "S_BOGOM"
+java -cp "out/production/java-advanced-2021" -p "artifacts";"lib" -m info.kgeorgiy.java.advanced.arrayset NavigableSet info.kgeorgiy.ja.kurdyukov.arrayset.ArraySet "S_BOGOM"

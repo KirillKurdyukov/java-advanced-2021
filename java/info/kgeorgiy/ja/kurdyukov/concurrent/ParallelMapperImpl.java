@@ -81,7 +81,7 @@ public class ParallelMapperImpl implements ParallelMapper {
      * @param <T> is type the specified list.
      * @param <R> is type result list.
      * @return result list when any thread is interrupted.
-     * @throws InterruptedException
+     * @throws InterruptedException when any thread is interrupted.
      */
     @Override
     public <T, R> List<R> map(Function<? super T, ? extends R> function, List<? extends T> list) throws InterruptedException {
