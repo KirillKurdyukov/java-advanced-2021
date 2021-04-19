@@ -46,11 +46,13 @@ public class ParallelMapperImpl implements ParallelMapper {
         threads.forEach(Thread::start);
     }
 
-    private static class MapperResult<R> {
+    private static class ListResult<R> {
         private final List<R> list;
         private int countElement;
+        private boolean wasException;
+        private RuntimeException runtimeException;
 
-        public MapperResult(List<R> list) {
+        public ListResult(List<R> list) {
             this.list = list;
         }
 
@@ -64,36 +66,63 @@ public class ParallelMapperImpl implements ParallelMapper {
         public synchronized List<R> getResult() throws InterruptedException {
             while (countElement != list.size())
                 wait();
+
+            if (wasException)
+                throw runtimeException;
+
             return list;
         }
     }
 
+    /**
+     * Applies a function {@link Function} to all elements of the specified list {@link List}.
+     * @param function is function {@link Function} to apply
+     * @param list is list {@link List} to process
+     * @param <T> is type the specified list.
+     * @param <R> is type result list.
+     * @return result list when any thread is interrupted.
+     * @throws InterruptedException
+     */
     @Override
     public <T, R> List<R> map(Function<? super T, ? extends R> function, List<? extends T> list) throws InterruptedException {
-        MapperResult<R> result = new MapperResult<>(new ArrayList<>(Collections.nCopies(list.size(), null)));
+        ListResult<R> result = new ListResult<>(new ArrayList<>(Collections.nCopies(list.size(), null)));
         IntStream.range(0, list.size())
-                .forEach(i -> pushRequest(() -> result
-                                .set(i, function
-                                        .apply(list.get(i))
-                                )
-                        )
+                .forEach((i) -> {
+                            try {
+                                pushRequest(() -> result
+                                        .set(i, function
+                                                .apply(list.get(i))
+                                        )
+                                );
+                            } catch (RuntimeException e) {
+                                synchronized (result) {
+                                    if (result.wasException)
+                                        result.runtimeException.addSuppressed(e);
+                                    else {
+                                        result.wasException = true;
+                                        result.runtimeException = e;
+                                    }
+                                    result.countElement++;
+                                }
+                            }
+                        }
                 );
         return result.getResult();
     }
 
+    /**
+     * Closes created threads.
+     */
     @Override
     public void close() {
         threads.forEach(Thread::interrupt);
         IterativeParallelism.joinThreads(threads);
     }
 
-    
 
-    /*
-    public static void main(String[] args) throws InterruptedException {
+/*    public static void main(String[] args) throws InterruptedException {
         ParallelMapperImpl p = new ParallelMapperImpl(3);
         List<Integer> list = List.of(3, 5, 6, 6, 1, 1,1, 1,1 ,1, 1);
-
         try {
             System.out.println(p.map(x -> x * x, list).toString());
             System.out.println(new IterativeParallelism(p).maximum(3, list, new Comparator<Integer>() {
@@ -106,12 +135,12 @@ public class ParallelMapperImpl implements ParallelMapper {
                         Thread.currentThread().interrupt();
                     }
                     System.out.println(Thread.currentThread().getName() + " " + a + " " + b);
-
                     return a.compareTo(b);
                 }
             }).toString());
-            p.close();
         } catch (InterruptedException ignored) {
+        } finally {
+            p.close();
         }
-    } */
+    }*/
 }
