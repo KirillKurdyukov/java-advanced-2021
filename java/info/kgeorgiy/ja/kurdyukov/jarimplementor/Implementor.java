@@ -74,6 +74,12 @@ public class Implementor implements JarImpler {
     private static final String CLASS = ".class";
 
     /**
+     * default constructor.
+     */
+    public Implementor() {
+
+    }
+    /**
      * Checks that the specified arguments is not <i>null</i>.
      *
      * @param args are specified arguments to check for <i>null</i>.

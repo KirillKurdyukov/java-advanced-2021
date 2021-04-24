@@ -44,10 +44,11 @@ public class IterativeParallelism implements ListIP {
                                           Function<List<U>, R> reduceFunction) throws InterruptedException {
         List<List<? extends T>> blocks = getBlocks(threadSize, list);
         List<Thread> threads = new ArrayList<>();
-        List<U> resultParallel = new ArrayList<>(Collections.nCopies(threadSize, null));
+        int correctSize = Math.min(threadSize, blocks.size());
+        List<U> resultParallel = new ArrayList<>(Collections.nCopies(correctSize, null));
         if (mapper == null) {
             List<U> finalResultParallel = resultParallel;
-            IntStream.range(0, threadSize).forEach(i -> {
+            IntStream.range(0, Math.min(correctSize, blocks.size())).forEach(i -> {
                 Thread thread = new Thread(() -> {
                     U resCurrent = function.apply(blocks.get(i));
                     finalResultParallel.set(i, resCurrent);

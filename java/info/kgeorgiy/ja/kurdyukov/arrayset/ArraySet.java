@@ -127,11 +127,13 @@ public class ArraySet<E> extends AbstractSet<E> implements NavigableSet<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean contains(Object o) {
         return Collections.binarySearch(arraySet, (E) o, comparator) >= 0;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Iterator<E> iterator() {
         return (Iterator<E>) arraySet.iterator();
     }
@@ -152,8 +154,7 @@ public class ArraySet<E> extends AbstractSet<E> implements NavigableSet<E> {
         return descendingSet().iterator();
     }
 
-    @Override
-    public NavigableSet<E> subSet(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
+    public NavigableSet<E> getSegment(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
         int l = fromInclusive ? posCeiling(fromElement) : posHigher(fromElement);
         int r = toInclusive ? posFloor(toElement) : posLower(toElement);
         if (l == -1 || r == -1 || r < l)
@@ -163,17 +164,28 @@ public class ArraySet<E> extends AbstractSet<E> implements NavigableSet<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public NavigableSet<E> subSet(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
+        if (comparator != null && comparator.compare(fromElement, toElement) > 0) {
+            throw new IllegalArgumentException("fromElement > toElement");
+        } else if (comparator == null && ((Comparator<E>) Comparator.naturalOrder()).compare(fromElement, toElement) > 0) {
+            throw new IllegalArgumentException("fromElement > toElement");
+        }
+        return getSegment(fromElement, fromInclusive, toElement, toInclusive);
+    }
+
+    @Override
     public NavigableSet<E> headSet(E toElement, boolean inclusive) {
         if (isEmpty())
             return this;
-        return subSet(first(), true, toElement, inclusive);
+        return getSegment(first(), true, toElement, inclusive);
     }
 
     @Override
     public NavigableSet<E> tailSet(E fromElement, boolean inclusive) {
         if (isEmpty())
             return this;
-        return subSet(fromElement, inclusive, last(), true);
+        return getSegment(fromElement, inclusive, last(), true);
     }
 
     @Override
@@ -182,13 +194,7 @@ public class ArraySet<E> extends AbstractSet<E> implements NavigableSet<E> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public SortedSet<E> subSet(E fromElement, E toElement) {
-        if (comparator != null && comparator.compare(fromElement, toElement) > 0) {
-            throw new IllegalArgumentException();
-        } else if (comparator == null && ((Comparator<E>) Comparator.naturalOrder()).compare(fromElement, toElement) > 0) {
-            throw new IllegalArgumentException();
-        }
         return subSet(fromElement, true, toElement, false);
     }
 

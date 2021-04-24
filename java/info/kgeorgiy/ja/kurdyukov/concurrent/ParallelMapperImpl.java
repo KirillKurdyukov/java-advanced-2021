@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 public class ParallelMapperImpl implements ParallelMapper {
 
-    final Queue<Runnable> requests = new LinkedList<>();
+    private final Queue<Runnable> requests = new LinkedList<>();
     private final List<Thread> threads;
 
     private Runnable poll() throws InterruptedException {
@@ -119,28 +119,4 @@ public class ParallelMapperImpl implements ParallelMapper {
         IterativeParallelism.joinThreads(threads);
     }
 
-
-/*    public static void main(String[] args) throws InterruptedException {
-        ParallelMapperImpl p = new ParallelMapperImpl(3);
-        List<Integer> list = List.of(3, 5, 6, 6, 1, 1,1, 1,1 ,1, 1);
-        try {
-            System.out.println(p.map(x -> x * x, list).toString());
-            System.out.println(new IterativeParallelism(p).maximum(3, list, new Comparator<Integer>() {
-                @Override
-                public int compare(final Integer a, final Integer b) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        Thread.currentThread().interrupt();
-                    }
-                    System.out.println(Thread.currentThread().getName() + " " + a + " " + b);
-                    return a.compareTo(b);
-                }
-            }).toString());
-        } catch (InterruptedException ignored) {
-        } finally {
-            p.close();
-        }
-    }*/
 }

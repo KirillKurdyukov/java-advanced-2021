@@ -43,7 +43,7 @@ public class StudentDB implements GroupQuery {
         return getGroupsBySomething(collection, this::sortStudentsById);
     }
 
-    private <T> GroupName getLargestGroupBySomething(Collection <Student> collection,
+    private GroupName getLargestGroupBySomething(Collection <Student> collection,
                                                      Function<List<Student>, Integer> function,
                                                      Comparator<Map.Entry<GroupName, List<Student>>> comparator) {
         return getMapToGroup(collection, Collectors.toList())
