@@ -41,7 +41,7 @@ public class IterativeParallelism implements ListIP {
     private <T, U, R> R getParallelResult(int threadSize,
                                           List<? extends T> list,
                                           Function<List<? extends T>, U> function,
-                                          Function<List<U>, R> reduceFunction) throws InterruptedException {
+                                          Function<List<U>, R> reduceFunction) {
         List<List<? extends T>> blocks = getBlocks(threadSize, list);
         List<Thread> threads = new ArrayList<>();
         int correctSize = Math.min(threadSize, blocks.size());
@@ -96,12 +96,12 @@ public class IterativeParallelism implements ListIP {
 
     private <T, U> List<U> noMonoid(int threadsSize,
                                     List<? extends T> list,
-                                    Function<Stream<? extends T>, Stream<? extends U>> function) throws InterruptedException {
+                                    Function<Stream<? extends T>, List<? extends U>> function) throws InterruptedException {
         return getParallelResult(threadsSize,
                 list,
                 l -> function.apply(l.stream()),
                 l -> l.stream()
-                        .flatMap(Function.identity())
+                        .flatMap(Collection::stream)
                         .collect(Collectors.toList()));
     }
 
@@ -119,7 +119,8 @@ public class IterativeParallelism implements ListIP {
     public <T> List<T> filter(int threadsSize, List<? extends T> list, Predicate<? super T> predicate) throws InterruptedException {
         return noMonoid(threadsSize,
                 list,
-                l -> l.filter(predicate));
+                l -> l.filter(predicate)
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -137,7 +138,8 @@ public class IterativeParallelism implements ListIP {
     public <T, U> List<U> map(int threadsSize, List<? extends T> list, Function<? super T, ? extends U> function) throws InterruptedException {
         return noMonoid(threadsSize,
                 list,
-                l -> l.map(function));
+                l -> l.map(function)
+                        .collect(Collectors.toList()));
     }
 
     /**

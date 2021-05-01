@@ -46,34 +46,6 @@ public class ParallelMapperImpl implements ParallelMapper {
         threads.forEach(Thread::start);
     }
 
-    private static class ListResult<R> {
-        private final List<R> list;
-        private int countElement;
-        private boolean wasException;
-        private RuntimeException runtimeException;
-
-        public ListResult(List<R> list) {
-            this.list = list;
-        }
-
-        public synchronized void set(int i, R el) {
-            list.set(i, el);
-            countElement++;
-            if (countElement == list.size())
-                notify();
-        }
-
-        public synchronized List<R> getResult() throws InterruptedException {
-            while (countElement != list.size())
-                wait();
-
-            if (wasException)
-                throw runtimeException;
-
-            return list;
-        }
-    }
-
     /**
      * Applies a function {@link Function} to all elements of the specified list {@link List}.
      * @param function is function {@link Function} to apply
@@ -96,13 +68,11 @@ public class ParallelMapperImpl implements ParallelMapper {
                                 );
                             } catch (RuntimeException e) {
                                 synchronized (result) {
-                                    if (result.wasException)
-                                        result.runtimeException.addSuppressed(e);
-                                    else {
-                                        result.wasException = true;
-                                        result.runtimeException = e;
-                                    }
-                                    result.countElement++;
+                                    if (result.getException())
+                                        result.addException(e);
+                                    else
+                                        result.setException(e);
+                                    result.counting();
                                 }
                             }
                         }
@@ -115,8 +85,10 @@ public class ParallelMapperImpl implements ParallelMapper {
      */
     @Override
     public void close() {
-        threads.forEach(Thread::interrupt);
-        IterativeParallelism.joinThreads(threads);
+        synchronized (threads) {
+            threads.forEach(Thread::interrupt);
+            IterativeParallelism.joinThreads(threads);
+        }
     }
 
 }
