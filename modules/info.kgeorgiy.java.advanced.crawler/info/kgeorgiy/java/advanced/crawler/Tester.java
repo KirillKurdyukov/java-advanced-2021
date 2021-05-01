@@ -1,4 +1,4 @@
-package info.kgeorgiy.java.advanced.mapper;
+package info.kgeorgiy.java.advanced.crawler;
 
 import info.kgeorgiy.java.advanced.base.BaseTester;
 
@@ -8,9 +8,8 @@ import info.kgeorgiy.java.advanced.base.BaseTester;
 public class Tester extends BaseTester {
     public static void main(final String... args) {
         new Tester()
-                .add("scalar", ScalarMapperTest.class)
-                .add("list", ListMapperTest.class)
-                .add("advanced", AdvancedMapperTest.class)
+                .add("easy", EasyCrawlerTest.class)
+                .add("hard", HardCrawlerTest.class)
                 .run(args);
     }
 }
