@@ -8,6 +8,7 @@
       <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.student.jar!/" />
       <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.walk.jar!/" />
       <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.mapper.jar!/" />
+      <root url="jar://$PROJECT_DIR$/artifacts/info.kgeorgiy.java.advanced.crawler.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
