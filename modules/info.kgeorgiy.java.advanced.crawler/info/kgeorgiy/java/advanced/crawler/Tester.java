@@ -12,4 +12,9 @@ public class Tester extends BaseTester {
                 .add("hard", HardCrawlerTest.class)
                 .run(args);
     }
+
+    static {
+        //noinspection ConstantConditions
+        assert Downloader.class.isAssignableFrom(CachingDownloader.class);
+    }
 }
