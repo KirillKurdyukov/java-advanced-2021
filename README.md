@@ -11,12 +11,15 @@
     ```info.kgeorgiy.java.advanced.crawler easy <полное имя класса>```
  * сложный вариант:
     ```info.kgeorgiy.java.advanced.crawler hard <полное имя класса>```
+ * продвинутый вариант: [интерфейс](modules/info.kgeorgiy.java.advanced.crawler/info/kgeorgiy/java/advanced/crawler/AdvancedCrawler.java)
+    ```info.kgeorgiy.java.advanced.crawler advanced <полное имя класса>```
 
 Исходный код тестов:
 
 * [интерфейсы и вспомогательные классы](modules/info.kgeorgiy.java.advanced.crawler/info/kgeorgiy/java/advanced/crawler/)
 * [простой вариант](modules/info.kgeorgiy.java.advanced.crawler/info/kgeorgiy/java/advanced/crawler/EasyCrawlerTest.java)
 * [сложный вариант](modules/info.kgeorgiy.java.advanced.crawler/info/kgeorgiy/java/advanced/crawler/HardCrawlerTest.java)
+* [продвинутый вариант](modules/info.kgeorgiy.java.advanced.crawler/info/kgeorgiy/java/advanced/crawler/AdvancedCrawlerTest.java)
 
 
 ## Домашнее задание 8. Параллельный запуск
