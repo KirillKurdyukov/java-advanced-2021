@@ -3,6 +3,7 @@ package info.kgeorgiy.ja.kurdyukov.crawler;
 import info.kgeorgiy.java.advanced.crawler.*;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Function;
@@ -11,6 +12,8 @@ import java.util.stream.IntStream;
 
 public class WebCrawler implements Crawler {
 
+    private final Map<String, SemaphoreQueue> hostMap = new ConcurrentHashMap<>();
+
     private final ExecutorService downloaderService;
 
     private final ExecutorService extractorService;
@@ -18,6 +21,34 @@ public class WebCrawler implements Crawler {
     private final Downloader downloader;
 
     private final int perHost;
+
+    private class SemaphoreQueue {
+        private final Queue<Runnable> requests = new LinkedList<>();
+        int counter;
+
+        public SemaphoreQueue(String s) {
+        }
+
+        synchronized void work() {
+            if (counter < perHost && !requests.isEmpty()) {
+                counter++;
+                downloaderService.submit(() -> {
+                    Objects.requireNonNull(requests.poll()).run();
+                    next();
+                });
+            }
+        }
+
+        synchronized void add(Runnable runnable) {
+            requests.add(runnable);
+            work();
+        }
+
+        void next() {
+            counter--;
+            work();
+        }
+    }
 
     @Override
     public Result download(String s, int i) {
@@ -87,14 +118,20 @@ public class WebCrawler implements Crawler {
                         errors,
                         phaserLevel)
                 );
+
             } catch (IOException e) {
                 errors.put(url, e);
             } finally {
                 phaserLevel.arrive();
             }
         };
-        phaserLevel.register();
-        downloaderService.submit(runnable);
+        try {
+            SemaphoreQueue queue = hostMap.computeIfAbsent(URLUtils.getHost(url), SemaphoreQueue::new);
+            phaserLevel.register();
+            queue.add(runnable);
+        } catch (MalformedURLException e) {
+            errors.put(url, e);
+        }
     }
 
     public WebCrawler(Downloader downloader, int downloaders, int extractors, int perHost) {
@@ -115,16 +152,16 @@ public class WebCrawler implements Crawler {
             throw new IllegalArgumentException("Correct usage: WebCrawler url [depth [downloads [extractors [perHost]]]]");
         }
         Function<Integer, Integer> index = (i) -> (i < args.length) ? Integer.parseInt(args[i]) : 5;
-        final String url = args[0];
-        final int depth = index.apply(1),
+        String url = args[0];
+        int depth = index.apply(1),
                 downloads = index.apply(2),
                 extractors = index.apply(3),
                 perHost = index.apply(4);
-        try (final Crawler crawler = new WebCrawler(null, downloads, extractors, perHost)) {
-            final Result result = crawler.download(url, depth);
+        try (Crawler crawler = new WebCrawler(null, downloads, extractors, perHost)) {
+            Result result = crawler.download(url, depth);
             result.getDownloaded().forEach(i -> System.out.println("URL: " + i));
             result.getErrors().forEach((key, value) -> System.out.println("URL: " + key + "\nError: " + value));
-        } catch (final Exception e) {
+        } catch (Exception e) {
             System.out.println("Crawler failed: " + e.getMessage());
         }
     }
