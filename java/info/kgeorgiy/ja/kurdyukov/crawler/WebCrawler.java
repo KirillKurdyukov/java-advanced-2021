@@ -50,6 +50,12 @@ public class WebCrawler implements Crawler {
         }
     }
 
+    /**
+     * Downloads pages recursively.
+     * @param s is tree root.
+     * @param i is depth tree.
+     * @return {@link Result}
+     */
     @Override
     public Result download(String s, int i) {
         Set<String> urls = ConcurrentHashMap.newKeySet();
@@ -147,6 +153,11 @@ public class WebCrawler implements Crawler {
         downloaderService.shutdown();
     }
 
+    /**
+     * When loaded, the traversal recursively accepts command-like
+     * arguments when used correctly: WebCrawler URL [depth [downloads [extractors [perHost]]]]
+     * @param args is command line arguments.
+     */
     public static void main(String[] args) {
         if (args == null || args.length == 0 || args.length > 5 || Arrays.stream(args).anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException("Correct usage: WebCrawler url [depth [downloads [extractors [perHost]]]]");
