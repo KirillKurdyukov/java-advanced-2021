@@ -3,6 +3,24 @@
 [Условия домашних заданий](https://www.kgeorgiy.info/courses/java-advanced/homeworks.html)
 
 
+## Домашнее задание 10. Hello UDP
+
+Интерфейсы
+
+ * `HelloUDPClient` должен реализовывать интерфейс
+    [HelloClient](modules/info.kgeorgiy.java.advanced.hello/info/kgeorgiy/java/advanced/hello/HelloClient.java)
+ * `HelloUDPServer` должен реализовывать интерфейс
+    [HelloServer](modules/info.kgeorgiy.java.advanced.hello/info/kgeorgiy/java/advanced/hello/HelloServer.java)
+
+Тестирование
+
+ * простой вариант:
+    * клиент:
+        ```info.kgeorgiy.java.advanced.hello client <полное имя класса>```
+    * сервер:
+        ```info.kgeorgiy.java.advanced.hello server <полное имя класса>```
+
+
 ## Домашнее задание 9. Web Crawler
 
 Тестирование
