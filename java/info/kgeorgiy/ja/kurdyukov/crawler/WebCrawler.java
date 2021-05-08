@@ -151,6 +151,17 @@ public class WebCrawler implements Crawler {
     public void close() {
         extractorService.shutdown();
         downloaderService.shutdown();
+        try {
+            if (!extractorService.awaitTermination(5, TimeUnit.SECONDS))
+                System.err.println("extractorService too long");
+            if (!downloaderService.awaitTermination(5, TimeUnit.SECONDS))
+                System.err.println("downloaderService too long");
+        } catch (InterruptedException e) {
+            System.err.println(e.getMessage());
+        } finally {
+            downloaderService.shutdownNow();
+            extractorService.shutdownNow();
+        }
     }
 
     /**
@@ -171,9 +182,7 @@ public class WebCrawler implements Crawler {
         try (Crawler crawler = new WebCrawler(null, downloads, extractors, perHost)) {
             Result result = crawler.download(url, depth);
             result.getDownloaded().forEach(i -> System.out.println("URL: " + i));
-            result.getErrors().forEach((key, value) -> System.out.println("URL: " + key + "\nError: " + value));
-        } catch (Exception e) {
-            System.out.println("Crawler failed: " + e.getMessage());
+            result.getErrors().forEach((key, value) -> System.out.println("URL: " + key + " Error: " + value));
         }
     }
 }
