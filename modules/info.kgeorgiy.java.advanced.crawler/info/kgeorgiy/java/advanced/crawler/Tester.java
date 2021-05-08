@@ -10,6 +10,7 @@ public class Tester extends BaseTester {
         new Tester()
                 .add("easy", EasyCrawlerTest.class)
                 .add("hard", HardCrawlerTest.class)
+                .add("advanced", AdvancedCrawlerTest.class)
                 .run(args);
     }
 
