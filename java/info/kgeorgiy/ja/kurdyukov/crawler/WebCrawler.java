@@ -52,6 +52,7 @@ public class WebCrawler implements Crawler {
 
     /**
      * Downloads pages recursively.
+     *
      * @param s is tree root.
      * @param i is depth tree.
      * @return {@link Result}
@@ -167,12 +168,15 @@ public class WebCrawler implements Crawler {
     /**
      * When loaded, the traversal recursively accepts command-like
      * arguments when used correctly: WebCrawler URL [depth [downloads [extractors [perHost]]]]
+     *
      * @param args is command line arguments.
      */
     public static void main(String[] args) {
+
         if (args == null || args.length == 0 || args.length > 5 || Arrays.stream(args).anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException("Correct usage: WebCrawler url [depth [downloads [extractors [perHost]]]]");
         }
+
         Function<Integer, Integer> index = (i) -> (i < args.length) ? Integer.parseInt(args[i]) : 5;
         String url = args[0];
         int depth = index.apply(1),
