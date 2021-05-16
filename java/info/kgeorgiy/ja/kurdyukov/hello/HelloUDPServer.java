@@ -1,4 +1,4 @@
-package info.kgeorgiy.ja.kurdyukov.hello;
+package ru.ifmo.rain.kurdyukov.hello;
 
 import info.kgeorgiy.java.advanced.hello.HelloServer;
 
@@ -8,11 +8,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
+
 
 public class HelloUDPServer implements HelloServer {
 
     private ExecutorService workers;
+    private ExecutorService listener;
     private DatagramSocket socket;
     private int sizeBuffer;
 
@@ -34,7 +35,7 @@ public class HelloUDPServer implements HelloServer {
     public boolean init(int port) {
         try {
             socket = new DatagramSocket(port);
-            socket.setSoTimeout(1000);
+            socket.setSoTimeout(100);
         } catch (SocketException e) {
             System.err.println("Error create client socket. " + e.getMessage());
             return false;
@@ -51,41 +52,38 @@ public class HelloUDPServer implements HelloServer {
     @Override
     public void start(int port, int threads) {
         workers = Executors.newFixedThreadPool(threads);
+        listener = Executors.newSingleThreadExecutor();
         if (!init(port))
             return;
-        IntStream.range(0, threads).forEach(i -> workers.submit(() -> {
+        listener.submit(() -> {
             while (!socket.isClosed() && !Thread.interrupted()) {
-                DatagramPacket packetRequest = new DatagramPacket(new byte[sizeBuffer], sizeBuffer);
+                DatagramPacket packetCommunicate = new DatagramPacket(new byte[sizeBuffer], sizeBuffer);
                 try {
-                    socket.receive(packetRequest);
+                    socket.receive(packetCommunicate);
                 } catch (IOException ignored) {
                     continue;
                 }
-                String data = new String(packetRequest.getData(),
-                        packetRequest.getOffset(),
-                        packetRequest.getLength(),
-                        StandardCharsets.UTF_8);
-                data = "Hello, " + data;
-                byte[] bytesData = data.getBytes(StandardCharsets.UTF_8);
-                SocketAddress address = new InetSocketAddress(packetRequest.getAddress(), packetRequest.getPort());
-                DatagramPacket packetResponse = new DatagramPacket(bytesData,
-                        bytesData.length,
-                        address
-                );
-                try {
-                    socket.send(packetResponse);
-                } catch (IOException ignored) {}
+                workers.submit(() -> {
+                    String data = UtilityUDP.getData(packetCommunicate);
+                    packetCommunicate.setData(("Hello, " + data).getBytes(StandardCharsets.UTF_8));
+                    try {
+                        socket.send(packetCommunicate);
+                    } catch (IOException ignored) {}
+                });
             }
-        }));
+        });
     }
 
     @Override
     public void close() {
         workers.shutdown();
+        listener.shutdownNow();
         socket.close();
         try {
             if (!workers.awaitTermination(10, TimeUnit.SECONDS))
                 workers.shutdownNow();
+            if (!listener.awaitTermination(10, TimeUnit.SECONDS))
+                listener.shutdownNow();
         } catch (InterruptedException ignored) {}
     }
 

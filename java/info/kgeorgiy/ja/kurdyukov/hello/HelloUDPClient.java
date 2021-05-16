@@ -1,4 +1,4 @@
-package info.kgeorgiy.ja.kurdyukov.hello;
+package ru.ifmo.rain.kurdyukov.hello;
 
 import info.kgeorgiy.java.advanced.hello.HelloClient;
 
@@ -50,24 +50,18 @@ public class HelloUDPClient implements HelloClient {
 
         private void doRequestAndGetResponse(int i, DatagramSocket socket, int sizeBuffer, int j) {
             String request = prefix + i + "_" + j;
-            byte[] bytesRequest = request.getBytes(StandardCharsets.UTF_8);
-            DatagramPacket packetRequest = new DatagramPacket(bytesRequest,
-                    bytesRequest.length,
-                    address
-            );
+            DatagramPacket packetRequest = UtilityUDP.getPacket(prefix + i + "_" + j, address);
             DatagramPacket packetResponse = new DatagramPacket(new byte[sizeBuffer], sizeBuffer);
             while (!socket.isClosed() && !Thread.interrupted()) {
                 try {
                     socket.send(packetRequest);
                     socket.receive(packetResponse);
-                    break;
                 } catch (IOException ignored) {}
+                String answerServer = UtilityUDP.getData(packetResponse);
+                System.out.println(answerServer);
+                if (answerServer.contains(request))
+                    break;
             }
-            String answerServer = new String(packetResponse.getData(),
-                    packetResponse.getOffset(),
-                    packetResponse.getLength(),
-                    StandardCharsets.UTF_8);
-            System.out.println(answerServer);
         }
 
         @Override
@@ -78,8 +72,7 @@ public class HelloUDPClient implements HelloClient {
                     System.err.println("Client too long.");
                 }
                 workers.shutdownNow();
-            } catch (InterruptedException ignored) {
-            }
+            } catch (InterruptedException ignored) {}
         }
     }
 
