@@ -3,12 +3,11 @@ package info.kgeorgiy.ja.kurdyukov.hello;
 import info.kgeorgiy.java.advanced.hello.HelloServer;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 public class HelloUDPServer implements HelloServer {
@@ -35,6 +34,7 @@ public class HelloUDPServer implements HelloServer {
     public boolean init(int port) {
         try {
             socket = new DatagramSocket(port);
+            socket.setSoTimeout(1000);
         } catch (SocketException e) {
             System.err.println("Error create client socket. " + e.getMessage());
             return false;
@@ -54,22 +54,27 @@ public class HelloUDPServer implements HelloServer {
         if (!init(port))
             return;
         IntStream.range(0, threads).forEach(i -> workers.submit(() -> {
-            while (!socket.isClosed()) {
+            while (!socket.isClosed() && !Thread.interrupted()) {
                 DatagramPacket packetRequest = new DatagramPacket(new byte[sizeBuffer], sizeBuffer);
                 try {
                     socket.receive(packetRequest);
-                } catch (IOException e) {
-                    System.err.println("Error get request to server. " + e.getMessage());
+                } catch (IOException ignored) {
+                    continue;
                 }
-                String data = new String(packetRequest.getData(), StandardCharsets.UTF_8);
-                data = "Hello," + data;
+                String data = new String(packetRequest.getData(),
+                        packetRequest.getOffset(),
+                        packetRequest.getLength(),
+                        StandardCharsets.UTF_8);
+                data = "Hello, " + data;
                 byte[] bytesData = data.getBytes(StandardCharsets.UTF_8);
+                SocketAddress address = new InetSocketAddress(packetRequest.getAddress(), packetRequest.getPort());
                 DatagramPacket packetResponse = new DatagramPacket(bytesData,
                         bytesData.length,
-                        packetRequest.getAddress(),
-                        packetRequest.getPort()
+                        address
                 );
-//                HelloUPDClient.trySend(socket, packetResponse);
+                try {
+                    socket.send(packetResponse);
+                } catch (IOException ignored) {}
             }
         }));
     }
@@ -78,6 +83,10 @@ public class HelloUDPServer implements HelloServer {
     public void close() {
         workers.shutdown();
         socket.close();
+        try {
+            if (!workers.awaitTermination(10, TimeUnit.SECONDS))
+                workers.shutdownNow();
+        } catch (InterruptedException ignored) {}
     }
 
 }
