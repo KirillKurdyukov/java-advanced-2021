@@ -1,4 +1,4 @@
-package ru.ifmo.rain.kurdyukov.hello;
+package info.kgeorgiy.ja.kurdyukov.hello;
 
 import java.net.DatagramPacket;
 import java.net.SocketAddress;

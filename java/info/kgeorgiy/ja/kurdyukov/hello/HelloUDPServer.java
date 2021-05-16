@@ -1,4 +1,4 @@
-package ru.ifmo.rain.kurdyukov.hello;
+package info.kgeorgiy.ja.kurdyukov.hello;
 
 import info.kgeorgiy.java.advanced.hello.HelloServer;
 

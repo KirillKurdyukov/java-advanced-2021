@@ -1,4 +1,4 @@
-package ru.ifmo.rain.kurdyukov.hello;
+package info.kgeorgiy.ja.kurdyukov.hello;
 
 import info.kgeorgiy.java.advanced.hello.HelloClient;
 
@@ -37,10 +37,9 @@ public class HelloUDPClient implements HelloClient {
         private void communicate(int i) {
             workers.submit(() -> {
                 try (DatagramSocket socket = new DatagramSocket()) {
-                    int sizeBuffer = socket.getReceiveBufferSize();
                     socket.setSoTimeout(100);
                     IntStream.range(0, requests).forEach(j ->
-                            doRequestAndGetResponse(i, socket, sizeBuffer, j)
+                            doRequestAndGetResponse(i, socket, j)
                     );
                 } catch (IOException e) {
                     System.err.println("Error create client socket. " + e.getMessage());
@@ -48,16 +47,15 @@ public class HelloUDPClient implements HelloClient {
             });
         }
 
-        private void doRequestAndGetResponse(int i, DatagramSocket socket, int sizeBuffer, int j) {
+        private void doRequestAndGetResponse(int i, DatagramSocket socket, int j) {
             String request = prefix + i + "_" + j;
-            DatagramPacket packetRequest = UtilityUDP.getPacket(prefix + i + "_" + j, address);
-            DatagramPacket packetResponse = new DatagramPacket(new byte[sizeBuffer], sizeBuffer);
+            DatagramPacket packetCommunicate = UtilityUDP.getPacket(prefix + i + "_" + j, address);
             while (!socket.isClosed() && !Thread.interrupted()) {
                 try {
-                    socket.send(packetRequest);
-                    socket.receive(packetResponse);
+                    socket.send(packetCommunicate);
+                    socket.receive(packetCommunicate);
                 } catch (IOException ignored) {}
-                String answerServer = UtilityUDP.getData(packetResponse);
+                String answerServer = UtilityUDP.getData(packetCommunicate);
                 System.out.println(answerServer);
                 if (answerServer.contains(request))
                     break;
