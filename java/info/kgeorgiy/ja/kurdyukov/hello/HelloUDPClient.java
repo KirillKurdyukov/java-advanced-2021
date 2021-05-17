@@ -4,7 +4,6 @@ import info.kgeorgiy.java.advanced.hello.HelloClient;
 
 import java.io.IOException;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -38,8 +37,9 @@ public class HelloUDPClient implements HelloClient {
             workers.submit(() -> {
                 try (DatagramSocket socket = new DatagramSocket()) {
                     socket.setSoTimeout(100);
+                    int sizeBuffer = socket.getReceiveBufferSize();
                     IntStream.range(0, requests).forEach(j ->
-                            doRequestAndGetResponse(i, socket, j)
+                            doRequestAndGetResponse(i, socket, sizeBuffer, j)
                     );
                 } catch (IOException e) {
                     System.err.println("Error create client socket. " + e.getMessage());
@@ -47,18 +47,21 @@ public class HelloUDPClient implements HelloClient {
             });
         }
 
-        private void doRequestAndGetResponse(int i, DatagramSocket socket, int j) {
+        private void doRequestAndGetResponse(int i, DatagramSocket socket, int sizeBuffer, int j) {
             String request = prefix + i + "_" + j;
-            DatagramPacket packetCommunicate = UtilityUDP.getPacket(prefix + i + "_" + j, address);
+            DatagramPacket packetRequest = UtilityUDP.getPacket(prefix + i + "_" + j, address);
+            DatagramPacket packetResponse = new DatagramPacket(new byte[sizeBuffer], sizeBuffer);
             while (!socket.isClosed() && !Thread.interrupted()) {
                 try {
-                    socket.send(packetCommunicate);
-                    socket.receive(packetCommunicate);
+                    socket.send(packetRequest);
+                    socket.receive(packetResponse);
                 } catch (IOException ignored) {}
-                String answerServer = UtilityUDP.getData(packetCommunicate);
-                System.out.println(answerServer);
-                if (answerServer.contains(request))
+                String answerServer = UtilityUDP.getData(packetResponse);
+                if (answerServer.contains(request)) {
+                    System.out.println(request);
+                    System.out.println(answerServer);
                     break;
+                }
             }
         }
 

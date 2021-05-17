@@ -1,1 +1,1 @@
-java -cp "out/production/java-advanced-2021" -p "artifacts";"lib" -m info.kgeorgiy.java.advanced.hello server info.kgeorgiy.ja.kurdyukov.hello.HelloUDPServer "S_BOGOM"
+java -cp "out/production/java-advanced-2021" -p "artifacts";"lib" -m info.kgeorgiy.java.advanced.hello client info.kgeorgiy.ja.kurdyukov.hello.HelloUDPClient "S_BOGOM"
