@@ -95,7 +95,9 @@ public class HelloUDPClient implements HelloClient {
 
     public static void main(String[] args) {
 
-        if (args == null || args.length != 5 || Arrays.stream(args).anyMatch(Objects::isNull)) {
+        if (args == null
+                || args.length != 5
+                || Arrays.stream(args).anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException("Correct usage:\n" +
                     "1.Name or ip - address of computer on which the server is running;\n" +
                     "2.Port number to send requests to\n" +
@@ -106,12 +108,15 @@ public class HelloUDPClient implements HelloClient {
 
         HelloUDPClient client = new HelloUDPClient();
 
-        client.run(args[0],
-                Integer.parseInt(args[1]),
-                args[2],
-                Integer.parseInt(args[3]),
-                Integer.parseInt(args[4])
-        );
-
+        try {
+            client.run(args[0],
+                    Integer.parseInt(args[1]),
+                    args[2],
+                    Integer.parseInt(args[3]),
+                    Integer.parseInt(args[4])
+            );
+        } catch (NumberFormatException e) {
+            System.err.println("Incorrect integer argument. " + e.getMessage());
+        }
     }
 }

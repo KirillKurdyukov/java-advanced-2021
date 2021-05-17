@@ -28,8 +28,12 @@ public class HelloUDPServer implements HelloServer {
         }
 
         HelloUDPServer server = new HelloUDPServer();
-        server.start(Integer.parseInt(args[0]),
-                Integer.parseInt(args[1]));
+        try {
+            server.start(Integer.parseInt(args[0]),
+                    Integer.parseInt(args[1]));
+        } catch (NumberFormatException e) {
+            System.err.println("Incorrect integer arguments. " + e.getMessage());
+        }
     }
 
     public boolean init(int port) {
@@ -77,7 +81,7 @@ public class HelloUDPServer implements HelloServer {
     @Override
     public void close() {
         workers.shutdown();
-        listener.shutdownNow();
+        listener.shutdown();
         socket.close();
         try {
             if (!workers.awaitTermination(10, TimeUnit.SECONDS))
