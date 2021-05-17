@@ -17,7 +17,7 @@ public final class Tester {
         }
 
         final BaseTester tester = new BaseTester();
-        for (final String suffix : List.of("", "-i18n")) {
+        for (final String suffix : List.of("", "-i18n", "-evil")) {
             tester.add("server" + suffix, HelloServerTest.class);
             tester.add("client" + suffix, HelloClientTest.class);
         }

@@ -25,6 +25,13 @@
         ```info.kgeorgiy.java.advanced.hello client-i18n <полное имя класса>```
     * сервер:
         ```info.kgeorgiy.java.advanced.hello server-i18n <полное имя класса>```
+ * продвинутый вариант:
+    * на противоположной стороне находится старая система,
+      не полностью соответствующая последней версии спецификации
+    * клиент:
+        ```info.kgeorgiy.java.advanced.hello client-evil <полное имя класса>```
+    * сервер:
+        ```info.kgeorgiy.java.advanced.hello server-evil <полное имя класса>```
 
 
 ## Домашнее задание 9. Web Crawler
