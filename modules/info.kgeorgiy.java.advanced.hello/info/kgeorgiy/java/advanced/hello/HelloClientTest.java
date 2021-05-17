@@ -11,40 +11,61 @@ import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Basic tests for {@link HelloClient}.
+ * Full tests for {@link HelloClient}.
  *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class HelloClientTest extends BaseTest {
-    private static int port = 28888;
+    private static final int PORT = 28888;
     public static final String PREFIX = HelloClientTest.class.getName();
 
     @Test
     public void test01_singleRequest() throws SocketException {
-        test(1, 1);
+        test(1, 1, 1);
+    }
+
+    @Test
+    public void test02_sequence() throws SocketException {
+        test(100, 1, 1);
     }
 
     @Test
     public void test03_singleWithFailures() throws SocketException {
-        test(1, 0.1);
+        test(1, 1, 0.1);
+    }
+
+    @Test
+    public void test04_sequenceWithFailures() throws SocketException {
+        test(20, 1, 0.5);
     }
 
     @Test
     public void test05_singleMultithreaded() throws SocketException {
-        test(10, 1);
+        test(1, 10, 1);
     }
 
-    private static void test(final int treads, final double p) throws SocketException {
-        final int port = HelloClientTest.port++;
+    @Test
+    public void test06_sequenceMultithreaded() throws SocketException {
+        test(10, 10, 1);
+    }
+
+    @Test
+    public void test07_sequenceMultithreadedWithFails() throws SocketException {
+        test(10, 10, 0.5);
+    }
+
+    private static void test(final int requests, final int threads, final double p) throws SocketException {
+        final long start = System.currentTimeMillis();
         final AtomicInteger[] expected;
-        try (final DatagramSocket socket = new DatagramSocket(port)) {
-            expected = Util.server(PREFIX, treads, p, socket);
+        try (final DatagramSocket socket = new DatagramSocket(PORT)) {
+            expected = Util.server(PREFIX, threads, p, socket);
             final HelloClient client = createCUT();
-            client.run("localhost", port, PREFIX, treads, 1);
+            client.run("localhost", PORT, PREFIX, threads, requests);
         }
         for (int i = 0; i < expected.length; i++) {
-            Assert.assertEquals("Invalid number of requests on thread " + i , 1, expected[i].get());
+            Assert.assertEquals("Invalid number of requests on thread " + i , requests, expected[i].get());
         }
+        System.err.printf("Test finished in %.3fs%n", (System.currentTimeMillis() - start) / 1000.0);
     }
 }

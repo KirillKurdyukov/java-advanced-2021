@@ -19,6 +19,12 @@
         ```info.kgeorgiy.java.advanced.hello client <полное имя класса>```
     * сервер:
         ```info.kgeorgiy.java.advanced.hello server <полное имя класса>```
+ * сложный вариант:
+    * на противоположной стороне находится система, дающая ответы на различных языках
+    * клиент:
+        ```info.kgeorgiy.java.advanced.hello client-i18n <полное имя класса>```
+    * сервер:
+        ```info.kgeorgiy.java.advanced.hello server-i18n <полное имя класса>```
 
 
 ## Домашнее задание 9. Web Crawler
