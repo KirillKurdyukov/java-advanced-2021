@@ -3,6 +3,25 @@
 [Условия домашних заданий](https://www.kgeorgiy.info/courses/java-advanced/homeworks.html)
 
 
+## Домашнее задание 12. HelloNonblockingUDP
+
+Интерфейсы
+
+ * `HelloUDPNonblockingClient` должен реализовывать интерфейс
+    [HelloClient](modules/info.kgeorgiy.java.advanced.hello/info/kgeorgiy/java/advanced/hello/HelloClient.java)
+ * `HelloUDPNonblockingServer` должен реализовывать интерфейс
+    [HelloServer](modules/info.kgeorgiy.java.advanced.hello/info/kgeorgiy/java/advanced/hello/HelloServer.java)
+
+Тестирование
+
+ * простой вариант:
+    * клиент:
+        ```info.kgeorgiy.java.advanced.hello client <полное имя класса>```
+    * сервер:
+        ```info.kgeorgiy.java.advanced.hello server <полное имя класса>```
+
+
+
 ## Домашнее задание 10. Hello UDP
 
 Интерфейсы
@@ -25,6 +44,13 @@
         ```info.kgeorgiy.java.advanced.hello client-i18n <полное имя класса>```
     * сервер:
         ```info.kgeorgiy.java.advanced.hello server-i18n <полное имя класса>```
+ * продвинутый вариант:
+    * на противоположной стороне находится старая система,
+      не полностью соответствующая последней версии спецификации
+    * клиент:
+        ```info.kgeorgiy.java.advanced.hello client-evil <полное имя класса>```
+    * сервер:
+        ```info.kgeorgiy.java.advanced.hello server-evil <полное имя класса>```
 
 
 ## Домашнее задание 9. Web Crawler
