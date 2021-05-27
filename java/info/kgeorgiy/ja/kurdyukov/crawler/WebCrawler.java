@@ -153,9 +153,9 @@ public class WebCrawler implements Crawler {
         extractorService.shutdown();
         downloaderService.shutdown();
         try {
-            if (!extractorService.awaitTermination(5, TimeUnit.SECONDS))
+            if (!extractorService.awaitTermination(1, TimeUnit.SECONDS))
                 System.err.println("extractorService too long");
-            if (!downloaderService.awaitTermination(5, TimeUnit.SECONDS))
+            if (!downloaderService.awaitTermination(1, TimeUnit.SECONDS))
                 System.err.println("downloaderService too long");
         } catch (InterruptedException e) {
             System.err.println(e.getMessage());

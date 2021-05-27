@@ -4,8 +4,6 @@ import info.kgeorgiy.java.advanced.hello.HelloClient;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -19,6 +17,7 @@ public class HelloUDPClient implements HelloClient {
         private final int requests;
         private final ExecutorService workers;
         private final SocketAddress address;
+
 
         private CommunicationServer(String host,
                                     int port,
@@ -36,7 +35,7 @@ public class HelloUDPClient implements HelloClient {
         private void communicate(int i) {
             workers.submit(() -> {
                 try (DatagramSocket socket = new DatagramSocket()) {
-                    socket.setSoTimeout(100);
+                    socket.setSoTimeout(UtilityUDP.TIMEOUT);
                     int sizeBuffer = socket.getReceiveBufferSize();
                     IntStream.range(0, requests).forEach(j ->
                             doRequestAndGetResponse(i, socket, sizeBuffer, j)
@@ -48,8 +47,8 @@ public class HelloUDPClient implements HelloClient {
         }
 
         private void doRequestAndGetResponse(int i, DatagramSocket socket, int sizeBuffer, int j) {
-            String request = prefix + i + "_" + j;
-            DatagramPacket packetRequest = UtilityUDP.getPacket(prefix + i + "_" + j, address);
+            String request = UtilityUDP.generateMessage(i, j, prefix);
+            DatagramPacket packetRequest = UtilityUDP.getPacket(request, address);
             DatagramPacket packetResponse = new DatagramPacket(new byte[sizeBuffer], sizeBuffer);
             while (!socket.isClosed() && !Thread.interrupted()) {
                 try {
@@ -58,8 +57,7 @@ public class HelloUDPClient implements HelloClient {
                 } catch (IOException ignored) {}
                 String answerServer = UtilityUDP.getData(packetResponse);
                 if (answerServer.contains(request)) {
-                    System.out.println(request);
-                    System.out.println(answerServer);
+                    UtilityUDP.log(request, answerServer);
                     break;
                 }
             }
@@ -89,34 +87,12 @@ public class HelloUDPClient implements HelloClient {
         ) {
             IntStream.range(0, threads).forEach(communicationServer::communicate);
         } catch (UnknownHostException e) {
-            System.err.println("Error found address server error");
+            System.err.println("Error found address server. " + e.getMessage());
         }
     }
 
     public static void main(String[] args) {
-
-        if (args == null
-                || args.length != 5
-                || Arrays.stream(args).anyMatch(Objects::isNull)) {
-            throw new IllegalArgumentException("Correct usage:\n" +
-                    "1.Name or ip - address of computer on which the server is running;\n" +
-                    "2.Port number to send requests to\n" +
-                    "3.Request prefix (string)\n" +
-                    "4.Number of parallel requests streams.\n" +
-                    "5.The number of requests in each thread.");
-        }
-
-        HelloUDPClient client = new HelloUDPClient();
-
-        try {
-            client.run(args[0],
-                    Integer.parseInt(args[1]),
-                    args[2],
-                    Integer.parseInt(args[3]),
-                    Integer.parseInt(args[4])
-            );
-        } catch (NumberFormatException e) {
-            System.err.println("Incorrect integer argument. " + e.getMessage());
-        }
+        UtilityUDP.mainClient(args, new HelloUDPClient());
     }
+
 }
