@@ -9,7 +9,7 @@ public class HelloUDPNonblockingClient implements HelloClient {
 
     @Override
     public void run(String host, int port, String prefix, int threads, int requests) {
-        try (CommunicationServer communicationServer = new CommunicationServer(host, port, prefix, requests)){
+        try (UnblockingCommunication communicationServer = new UnblockingCommunication(host, port, prefix, requests)){
             IntStream.range(0, threads).forEach(communicationServer::createCommunicate);
             communicationServer.start();
         } catch (IOException e) {

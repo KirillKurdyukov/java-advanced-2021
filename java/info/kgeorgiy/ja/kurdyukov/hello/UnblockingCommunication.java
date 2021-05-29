@@ -12,14 +12,13 @@ import java.nio.channels.Selector;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
-public class CommunicationServer implements AutoCloseable {
-
+public class UnblockingCommunication implements AutoCloseable {
     private final Selector selector;
     private final SocketAddress socketAddress;
     private final String prefix;
     private final int requests;
 
-    public CommunicationServer(String host, int port, String prefix, int requests) throws IOException {
+    public UnblockingCommunication(String host, int port, String prefix, int requests) throws IOException {
         this.selector = Selector.open();
         this.socketAddress = new InetSocketAddress(InetAddress.getByName(host), port);
         this.prefix = prefix;
@@ -27,6 +26,7 @@ public class CommunicationServer implements AutoCloseable {
     }
 
     private class ContextData {
+
         private final int numThread;
         private int numRequest = 0;
         private final ByteBuffer buffer;
@@ -68,13 +68,18 @@ public class CommunicationServer implements AutoCloseable {
         String request = UtilityUDP.generateMessage(data.numThread,
                 data.numRequest,
                 prefix);
+        ByteBuffer buffer = data.getData();
+        buffer.clear();
+        buffer.put(request.getBytes(StandardCharsets.UTF_8));
+        buffer.flip();
         try {
-            channel.send(ByteBuffer.wrap(request.getBytes(StandardCharsets.UTF_8)), socketAddress);
+            channel.send(buffer, socketAddress);
         } catch (IOException e) {
             System.err.println("Error send message: " + request + " " + e.getMessage());
+            key.interestOps();
             return;
         }
-        key.interestOps(SelectionKey.OP_WRITE);
+        key.interestOps(SelectionKey.OP_READ);
     }
 
     private void makeResponse(SelectionKey key) {
@@ -89,6 +94,7 @@ public class CommunicationServer implements AutoCloseable {
         } catch (IOException e) {
             System.err.println("Error receive data: " + e.getMessage());
         }
+        buffer.flip();
         String response = UtilityUDP.decodeBuffer(buffer);
         String request = UtilityUDP.generateMessage(data.numThread, data.numRequest, prefix);
         if (response.contains(request)) {
@@ -105,7 +111,7 @@ public class CommunicationServer implements AutoCloseable {
     }
 
     public void start() {
-        while(!Thread.interrupted() && !selector.keys().isEmpty()) {
+        do {
             try {
                 selector.select(UtilityUDP.TIMEOUT);
             } catch (IOException e) {
@@ -121,8 +127,10 @@ public class CommunicationServer implements AutoCloseable {
                         it.remove();
                     }
                 }
+            } else {
+                selector.keys().forEach(this::makeRequest);
             }
-        }
+        } while(!Thread.interrupted() && !selector.keys().isEmpty());
     }
 
     @Override
