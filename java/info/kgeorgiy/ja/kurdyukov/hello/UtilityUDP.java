@@ -5,18 +5,44 @@ import info.kgeorgiy.java.advanced.hello.HelloServer;
 
 import java.net.DatagramPacket;
 import java.net.SocketAddress;
+import java.net.SocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class UtilityUDP {
 
+    public final static int BUFFER_SIZE = Math.max(SocketOptions.SO_SNDBUF, SocketOptions.SO_RCVBUF);
     public static final int TIMEOUT = 100;
+    public static final int AWAIT_TERMINATE = 1;
+
+    public static void stopService(ExecutorService listener, ExecutorService workers) {
+        try {
+            listener.shutdown();
+            workers.shutdown();
+            if (!workers.awaitTermination(UtilityUDP.AWAIT_TERMINATE, TimeUnit.SECONDS))
+                workers.shutdownNow();
+            if (!listener.awaitTermination(UtilityUDP.AWAIT_TERMINATE, TimeUnit.SECONDS))
+                listener.shutdownNow();
+        } catch (InterruptedException ignored) {}
+    }
 
     public static void log(String request, String response) {
         System.out.println("Request: " + request);
         System.out.println("Response: " + response);
+    }
+
+    public static void setInBufferData(ByteBuffer buffer, String data) {
+        buffer.clear()
+                .put(data.getBytes(StandardCharsets.UTF_8))
+                .flip();
+    }
+
+    public static String getDecodeString(ByteBuffer buffer) {
+        return UtilityUDP.decodeBuffer(buffer.flip());
     }
 
     public static String decodeBuffer(ByteBuffer buffer) {

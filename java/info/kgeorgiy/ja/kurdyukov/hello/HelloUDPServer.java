@@ -65,15 +65,8 @@ public class HelloUDPServer implements HelloServer {
 
     @Override
     public void close() {
-        workers.shutdown();
-        listener.shutdown();
         socket.close();
-        try {
-            if (!workers.awaitTermination(1, TimeUnit.SECONDS))
-                workers.shutdownNow();
-            if (!listener.awaitTermination(1, TimeUnit.SECONDS))
-                listener.shutdownNow();
-        } catch (InterruptedException ignored) {}
+        UtilityUDP.stopService(listener, workers);
     }
 
 }

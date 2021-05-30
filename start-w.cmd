@@ -1,1 +1,1 @@
-java -cp "out/production/java-advanced-2021" -p "artifacts";"lib" -m info.kgeorgiy.java.advanced.hello client info.kgeorgiy.ja.kurdyukov.hello.HelloUDPNonblockingClient "S_BOGOM"
+java -cp "out/production/java-advanced-2021" -p "artifacts";"lib" -m info.kgeorgiy.java.advanced.hello server-i18n info.kgeorgiy.ja.kurdyukov.hello.HelloUDPNonblockingServer "S_BOGOM"
