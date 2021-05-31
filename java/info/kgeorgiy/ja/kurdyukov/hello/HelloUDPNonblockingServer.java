@@ -53,7 +53,7 @@ public class HelloUDPNonblockingServer implements HelloServer {
                                 SelectionKey.OP_READ);
             } catch (Throwable e) {
                 channel.close();
-                return false;
+                throw e;
             }
         } catch (IOException e) {
             System.err.println("Can't create datagram channel. " + e.getMessage());
@@ -77,18 +77,17 @@ public class HelloUDPNonblockingServer implements HelloServer {
         listener.submit(() -> {
             while (!Thread.interrupted() && channel.isOpen()) {
                 try {
-                    selector.select(UtilityUDP.TIMEOUT);
+                    selector.select(this::move, UtilityUDP.TIMEOUT);
                 } catch (IOException e) {
                     System.err.println("Too long wait server. " + e.getMessage());
                 }
-                for (final var it = selector.selectedKeys().iterator(); it.hasNext(); ) {
-                    SelectionKey key = it.next();
-                    makeResponse(key);
-                    makeRequest(key);
-                    it.remove();
-                }
             }
         });
+    }
+
+    private void move(SelectionKey key) {
+        makeResponse(key);
+        makeRequest(key);
     }
 
     private void makeResponse(SelectionKey key) {
@@ -106,11 +105,11 @@ public class HelloUDPNonblockingServer implements HelloServer {
             System.err.println("Error receive message. " + e.getMessage());
         }
         workers.submit(() -> {
-            String response = "Hello, " +  UtilityUDP.getDecodeString(buffer);
+            String response = "Hello, " + UtilityUDP.getDecodeString(buffer);
             UtilityUDP.setInBufferData(buffer, response);
             queueResponse.add(data);
             synchronized (key) {
-                key.interestOps(SelectionKey.OP_WRITE);
+                key.interestOpsOr(SelectionKey.OP_WRITE);
             }
         });
     }
@@ -130,15 +129,17 @@ public class HelloUDPNonblockingServer implements HelloServer {
         }
         queueRequests.add(data.buffer.clear());
         if (!queueResponse.isEmpty()) {
-            key.interestOpsAnd(~SelectionKey.OP_READ);
+            key.interestOpsOr(SelectionKey.OP_READ);
         }
     }
 
     @Override
     public void close() {
         try {
-            selector.close();
-            channel.close();
+            if (selector != null)
+                selector.close();
+            if (selector != null)
+                channel.close();
             UtilityUDP.stopService(listener, workers);
         } catch (IOException e) {
             System.err.println("Error close selector. " + e.getMessage());

@@ -84,7 +84,6 @@ public class HelloUDPNonblockingClient implements HelloClient {
                 channel.write(buffer);
             } catch (IOException e) {
                 System.err.println("Error send message: " + request + " " + e.getMessage());
-                key.interestOps();
                 return;
             }
             key.interestOps(SelectionKey.OP_READ);
@@ -116,8 +115,9 @@ public class HelloUDPNonblockingClient implements HelloClient {
             }
         }
 
-        public void start() {
+        public void start(int threads) {
             try {
+                IntStream.range(0, threads).forEach(this::createCommunicate);
                 do {
                     try {
                         selector.select(UtilityUDP.TIMEOUT);
@@ -150,15 +150,15 @@ public class HelloUDPNonblockingClient implements HelloClient {
 
         @Override
         public void close() throws IOException {
-            selector.close();
+            if (selector != null)
+                selector.close();
         }
     }
 
     @Override
     public void run(String host, int port, String prefix, int threads, int requests) {
         try (UnblockingCommunication communicationServer = new UnblockingCommunication(host, port, prefix, requests)) {
-            IntStream.range(0, threads).forEach(communicationServer::createCommunicate);
-            communicationServer.start();
+            communicationServer.start(threads);
         } catch (IOException e) {
             System.err.println("Error create selector or found address. " + e.getMessage());
         }
