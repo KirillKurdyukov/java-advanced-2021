@@ -91,7 +91,7 @@ public class HelloUDPNonblockingServer implements HelloServer {
     }
 
     private void makeResponse(SelectionKey key) {
-        if (!key.isReadable())
+        if (!key.isValid() || !key.isReadable())
             return;
         if (queueRequests.isEmpty()) {
             key.interestOps(SelectionKey.OP_WRITE);
@@ -115,7 +115,7 @@ public class HelloUDPNonblockingServer implements HelloServer {
     }
 
     private void makeRequest(SelectionKey key) {
-        if (!key.isWritable())
+        if (!key.isValid() || !key.isWritable())
             return;
         if (queueResponse.isEmpty()) {
             key.interestOps(SelectionKey.OP_READ);
