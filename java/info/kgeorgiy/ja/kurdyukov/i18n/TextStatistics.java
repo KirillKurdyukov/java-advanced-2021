@@ -123,7 +123,7 @@ public class TextStatistics {
         ResultStatistics<Number> numbers = getNumbersStatistics(Type.NUMBER, text);
         ResultStatistics<Number> currency = getNumbersStatistics(Type.MONEY, text);
         ResultStatistics<Date> dates = getDatesStatistics(text);
-        bundle = ResourceBundle.getBundle("info.keorgiy.java.kurdyukov.i18n.UsageResourseBundle", output);
+        bundle = ResourceBundle.getBundle("info.kgeorgiy.ja.kurdyukov.i18n.UsageResourseBundle", output);
         FORM_FOR_STRING = bundle.getString("formString");
         FORM_FOR_STAT = bundle.getString("formStat") + lineSeparator;
         FORM_FOR_STAT_UNIQUE = bundle.getString("formStatUnique") + lineSeparator;

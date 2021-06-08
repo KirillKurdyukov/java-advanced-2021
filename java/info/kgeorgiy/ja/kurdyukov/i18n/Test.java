@@ -77,6 +77,7 @@ public class Test {
     @org.junit.Test
     public void test1() throws TextStatisticsException {
         TextStatistics statistics = new TextStatistics(Locale.US, new Locale("ru"));
+        setDates(statistics, text1);
         Assert.assertEquals(1, sentences.getSizeData());
         Assert.assertEquals(43, worlds.getSizeData());
         Assert.assertEquals("Friday", worlds.getMinElement());
@@ -184,11 +185,4 @@ public class Test {
         Assert.assertEquals("Fri Aug 06 02:00:00 MSD 1993", dates.getAverageData().toString());
     }
 
-    @org.junit.Test
-    public void test6() throws TextStatisticsException {
-        TextStatistics statistics = new TextStatistics(new Locale("en", "US"), new Locale("ru", "RU"));
-        setDates(statistics, "$1");
-        Assert.assertEquals("1,00 ₽", MessageFormat.format("{0, number, currency}", currency.getMaxElement()));
-        Assert.assertEquals(1, currency.getSizeData());
-    }
 }
