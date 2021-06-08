@@ -1,6 +1,0 @@
-#!/bin/bash
-javac -cp ../artifacts/info.kgeorgiy.java.advanced.implementor.jar info/kgeorgiy/ja/kurdyukov/jarimplementor/Implementor.java \
-&& jar cmvf MANIFEST.MF Implementor.jar "info/kgeorgiy/ja/kurdyukov/jarimplementor/Implementor\$MethodSignature.class" \
-"info/kgeorgiy/ja/kurdyukov/jarimplementor/Implementor\$1.class" \
- "info/kgeorgiy/ja/kurdyukov/jarimplementor/Implementor.class" \
-&& java -jar Implementor.jar "$@"
